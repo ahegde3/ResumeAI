@@ -1,6 +1,6 @@
 from fastapi import FastAPI, UploadFile, Form, Request,File
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
-from chatbot import get_agent
+from chatbot import get_agent , chat_with_bot
 from pathlib import Path
 from typing import Optional
 from fastapi import HTTPException, status
@@ -40,6 +40,9 @@ async def chat_endpoint(request: Request):
         return JSONResponse({"error": "Empty message"}, status_code=400)
     # Send user message to agent and get response
     response = agent.run({"input": user_message})
+    if response == "CHAT":
+        response = chat_with_bot(user_message)
+    print(response)
     return {"response": response}
 
 @app.get("/download/")
