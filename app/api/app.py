@@ -4,8 +4,9 @@ from fastapi import Request, File, Form, UploadFile
 from fastapi.responses import JSONResponse
 from typing import Optional
 from pathlib import Path
-from app.services.chatbot import chat_with_bot ,extract_file_content, get_agent
+from app.services.chatbot import chat_with_bot , get_agent
 from app.services.resume_editor import extract_resume_info
+from app.utils.file import extract_file_content
 
 
 

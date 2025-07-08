@@ -4,18 +4,15 @@ from langchain.memory import ConversationBufferMemory
 from dotenv import load_dotenv
 from app.services.llm_handler import LLMHandler
 from app.services.prompt import get_system_prompt
-import os
-load_dotenv()
+
+from app.utils.file import get_latest_uploaded_file_content
+
 
 from app.services.resume_editor import change_email, change_name, change_location
 
-from pathlib import Path
-import mimetypes
-import PyPDF2
-import docx
-import csv
-import json
-import aiofiles
+load_dotenv()
+
+
 
 
 llm_chat = LLMHandler().model
@@ -123,79 +120,7 @@ def get_agent():
 
 
 
-def get_latest_uploaded_file_content(upload_dir="uploads"):
-    files = [f for f in os.listdir(upload_dir) if os.path.isfile(os.path.join(upload_dir, f))]
-    if not files:
-        return None
-    return extract_file_content(os.path.join(upload_dir, files[-1]))
+
     
 
 
-def extract_file_content(file_path: str, max_length: int = 10000) -> str:
-    """
-    Extract content from a file based on its type.
-    
-    Args:
-        file_path: Path to the file
-        max_length: Maximum length of content to extract
-        
-    Returns:
-        String containing the extracted content
-    """
-    file_path = Path(file_path)
-    if not file_path.exists():
-        raise FileNotFoundError(f"File not found: {file_path}")
-    
-    mime_type, _ = mimetypes.guess_type(file_path)
-    
-    # Text files (including .tex)
-    if mime_type in ['text/plain', 'text/markdown', 'application/json', 'text/html', 'text/css', 'text/javascript'] or file_path.suffix in ['.txt', '.md', '.json', '.html', '.css', '.js', '.py', '.java', '.c', '.cpp', '.h', '.ts', '.tsx', '.jsx', '.tex']:
-        with open(file_path, 'r', errors='ignore') as f:
-            content = f.read()
-            return content[:max_length]
-    
-    # PDF files
-    elif mime_type == 'application/pdf' or file_path.suffix == '.pdf':
-        try:
-            text = []
-            with open(file_path, 'rb') as f:
-                pdf_reader = PyPDF2.PdfReader(f)
-                for page_num in range(len(pdf_reader.pages)):
-                    page = pdf_reader.pages[page_num]
-                    text.append(page.extract_text())
-                    
-                    # Check if we've reached the max length
-                    content = "\n\n".join(text)
-                    if len(content) >= max_length:
-                        return content[:max_length]
-                        
-            return "\n\n".join(text)
-        except Exception as e:
-            return f"Error extracting PDF content: {str(e)}"
-    
-    # Word documents
-    elif mime_type in ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'] or file_path.suffix in ['.doc', '.docx']:
-        try:
-            doc = docx.Document(file_path)
-            content = "\n".join([para.text for para in doc.paragraphs])
-            return content[:max_length]
-        except Exception as e:
-            return f"Error extracting Word document content: {str(e)}"
-    
-    # CSV files
-    elif mime_type == 'text/csv' or file_path.suffix == '.csv':
-        try:
-            rows = []
-            with open(file_path, 'r', newline='', encoding='utf-8') as f:
-                csv_reader = csv.reader(f)
-                for row in csv_reader:
-                    rows.append(",".join(row))
-                    if len("\n".join(rows)) >= max_length:
-                        break
-            return "\n".join(rows)[:max_length]
-        except Exception as e:
-            return f"Error extracting CSV content: {str(e)}"
-    
-    # Images and other binary files
-    else:
-        return f"[File content not extracted: {file_path.name} is a {mime_type or 'binary'} file]"

@@ -46,7 +46,6 @@ chain = LLMChain(llm=llm_extractor, prompt=prompt)
 
 def extract_resume_info(resume: str):
     response = chain.run(resume=resume)
-    print(response)
     return response
 
 
