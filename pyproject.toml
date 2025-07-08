@@ -1,0 +1,22 @@
+[project]
+name = "resume-bot"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "ahegde3",email = "ahegde3@outlook.com"}
+]
+readme = "README.md"
+requires-python = "^3.12"
+dependencies = [
+    "fastapi (>=0.116.0,<0.117.0)",
+    "uvicorn (>=0.35.0,<0.36.0)",
+    "langchain (>=0.3.26,<0.4.0)",
+    "openai (>=1.93.1,<2.0.0)",
+    "langchain-community (>=0.3.27,<0.4.0)",
+    "langchain-openai (>=0.3.27,<0.4.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
