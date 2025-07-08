@@ -28,12 +28,19 @@ def tool_change_location(args: str):
     return change_location(latex, location)
 
 
+@tool("Chat")
+def tool_chat(message: str):
+    "Responds conversationally to the user input."
+    return "Hello, how can I help you today?"
+
+
 def get_agent():
     llm = ChatOpenAI(model="gpt-3.5-turbo")  # Or your preferred model
     agent = initialize_agent(
-        [tool_change_email, tool_change_name, tool_change_location],
+        [tool_change_email, tool_change_name, tool_change_location,tool_chat],
         llm,
         agent="chat-zero-shot-react-description",
-        verbose=True
+        verbose=True,
+        handle_parsing_errors=True
     )
     return agent

@@ -1,5 +1,5 @@
-from fastapi import FastAPI, UploadFile, Form
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi import FastAPI, UploadFile, Form, Request
+from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 from chatbot import get_agent
 
 app = FastAPI()
@@ -21,6 +21,16 @@ async def edit_resume(file: UploadFile, command: str = Form(...)):
     with open("output.tex", "w") as f:
         f.write(result)
     return {"latex": result}
+
+@app.post("/chat")
+async def chat_endpoint(request: Request):
+    data = await request.json()
+    user_message = data.get("message", "").strip()
+    if not user_message:
+        return JSONResponse({"error": "Empty message"}, status_code=400)
+    # Send user message to agent and get response
+    response = agent.run({"input": user_message})
+    return {"response": response}
 
 @app.get("/download/")
 def download():

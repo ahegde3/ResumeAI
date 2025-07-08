@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pdb
+*.egg-info/
+
+# Poetry
+poetry.lock
+.env
+.venv/
+
+# VSCode
+.vscode/
+
+# macOS
+.DS_Store
+
+# Node.js/Next.js
+node_modules/
+.next/
+out/
+
+# Logs
+*.log
+
+# Build
+build/
+dist/
+
+# Test
+coverage/
+
+# Misc
+*.swp
+*.swo
+
+# Local environment
+.env.*
+.envrc 

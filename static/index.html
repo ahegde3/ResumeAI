@@ -1,32 +1,136 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Resume Editor Bot</title>
-</head>
-<body>
-  <h1>Resume Editor Bot</h1>
-  <form id="form" enctype="multipart/form-data">
-    <label>Upload LaTeX Resume:</label>
-    <input type="file" name="file" required /><br><br>
-    <label>What do you want to change?</label>
-    <input type="text" name="command" placeholder="e.g. Change email to john@example.com" required /><br><br>
-    <button type="submit">Edit</button>
-  </form>
-  <pre id="result"></pre>
-  <a id="download" href="/download/" style="display:none;" download="edited_resume.tex">Download Edited Resume</a>
+  <head>
+    <title>Resume Chat Bot</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        background: #f6f6f6;
+        margin: 0;
+        padding: 0;
+      }
+      .chat-container {
+        max-width: 480px;
+        margin: 40px auto;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px #0001;
+        padding: 24px;
+      }
+      .chat-history {
+        height: 320px;
+        overflow-y: auto;
+        border: 1px solid #eee;
+        border-radius: 6px;
+        padding: 12px;
+        background: #fafbfc;
+        margin-bottom: 16px;
+      }
+      .message {
+        margin-bottom: 12px;
+      }
+      .message.user {
+        text-align: right;
+      }
+      .message.bot {
+        text-align: left;
+      }
+      .message .bubble {
+        display: inline-block;
+        padding: 8px 14px;
+        border-radius: 16px;
+        max-width: 80%;
+      }
+      .message.user .bubble {
+        background: #2563eb;
+        color: #fff;
+      }
+      .message.bot .bubble {
+        background: #e5e7eb;
+        color: #222;
+      }
+      .chat-input-row {
+        display: flex;
+        gap: 8px;
+      }
+      .chat-input {
+        flex: 1;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        font-size: 1rem;
+      }
+      .send-btn {
+        background: #2563eb;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 0 20px;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+      .send-btn:active {
+        background: #1e40af;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chat-container">
+      <h2>Resume Chat Bot</h2>
+      <div id="chat-history" class="chat-history"></div>
+      <form id="chat-form" autocomplete="off">
+        <div class="chat-input-row">
+          <input
+            id="chat-input"
+            class="chat-input"
+            type="text"
+            placeholder="Type your message..."
+            required
+          />
+          <button class="send-btn" type="submit">Send</button>
+        </div>
+      </form>
+    </div>
+    <script>
+      const chatHistory = document.getElementById("chat-history");
+      const chatForm = document.getElementById("chat-form");
+      const chatInput = document.getElementById("chat-input");
 
-  <script>
-    document.getElementById("form").onsubmit = async function(e) {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const response = await fetch("/edit/", {
-        method: "POST",
-        body: formData
-      });
-      const data = await response.json();
-      document.getElementById("result").textContent = data.latex;
-      document.getElementById("download").style.display = "block";
-    };
-  </script>
-</body>
+      function appendMessage(sender, text) {
+        const msgDiv = document.createElement("div");
+        msgDiv.className = `message ${sender}`;
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+        bubble.textContent = text;
+        msgDiv.appendChild(bubble);
+        chatHistory.appendChild(msgDiv);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+      }
+
+      chatForm.onsubmit = async function (e) {
+        e.preventDefault();
+        const userMsg = chatInput.value.trim();
+        if (!userMsg) return;
+        appendMessage("user", userMsg);
+        chatInput.value = "";
+        try {
+          const response = await fetch("/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: userMsg }),
+          });
+          const data = await response.json();
+          if (data.response) {
+            appendMessage("bot", data.response);
+          } else if (data.error) {
+            appendMessage("bot", "[Error] " + data.error);
+          } else {
+            appendMessage("bot", "[Error] Unexpected response");
+          }
+        } catch (err) {
+          appendMessage("bot", "[Error] Could not reach server");
+        }
+      };
+    </script>
+  </body>
 </html>
