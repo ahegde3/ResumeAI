@@ -10,8 +10,6 @@ from app.utils.file import extract_file_content
 
 
 
-
-
 router = APIRouter(tags=["api"])
 
 
