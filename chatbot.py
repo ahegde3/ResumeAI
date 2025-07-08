@@ -2,10 +2,14 @@ from langchain_openai import ChatOpenAI
 from langchain.agents import tool, initialize_agent
 from langchain.memory import ConversationBufferMemory
 from dotenv import load_dotenv
+from llm_handler import LLMHandler
 
 load_dotenv()
 
 from resume_editor import change_email, change_name, change_location
+
+
+llm_chat = LLMHandler().model
 
 def parse_args(args: str) -> list[str]:
     return [a.strip() for a in args.split(",")]
@@ -33,17 +37,26 @@ def tool_change_location(args: str):
     return change_location(latex, location)
 
 
-@tool("Chat")
+@tool("Chat", return_direct=True)
 def tool_chat(message: str):
     """
     Respond conversationally to the user.
     Use this tool for all general questions, greetings, or when the user is not asking to edit the resume.
-    """         
-    return ChatOpenAI(model="gpt-3.5-turbo").invoke(message)
+    """
+    response = llm_chat.invoke(message)
+    # If response is a Message object, extract the content
+    if hasattr(response, "content"):
+        return response.content
+    # If response is a dict, extract the 'content' key
+    if isinstance(response, dict) and "content" in response:
+        return response["content"]
+    # Otherwise, just return as string
+    return str(response)
 
 
 def get_agent():
-    llm = ChatOpenAI(model="gpt-3.5-turbo")  # Or your preferred model
+    # llm = ChatOpenAI(model="gpt-3.5-turbo")  # Or your preferred model
+    llm = LLMHandler().model
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
     agent = initialize_agent(
         [tool_change_email, tool_change_name, tool_change_location, tool_chat],
