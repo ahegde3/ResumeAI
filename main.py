@@ -4,6 +4,7 @@ from chatbot import get_agent
 
 app = FastAPI()
 agent = get_agent()
+message_history = []
 
 @app.get("/", response_class=HTMLResponse)
 def serve_ui():
