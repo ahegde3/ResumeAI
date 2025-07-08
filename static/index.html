@@ -87,6 +87,15 @@
             placeholder="Type your message..."
             required
           />
+          <input id="file-input" type="file" style="display: none" />
+          <button
+            id="upload-btn"
+            type="button"
+            class="send-btn"
+            style="padding: 0 12px"
+          >
+            📎
+          </button>
           <button class="send-btn" type="submit">Send</button>
         </div>
       </form>
@@ -95,6 +104,8 @@
       const chatHistory = document.getElementById("chat-history");
       const chatForm = document.getElementById("chat-form");
       const chatInput = document.getElementById("chat-input");
+      const fileInput = document.getElementById("file-input");
+      const uploadBtn = document.getElementById("upload-btn");
 
       function appendMessage(sender, text) {
         const msgDiv = document.createElement("div");
@@ -106,6 +117,28 @@
         chatHistory.appendChild(msgDiv);
         chatHistory.scrollTop = chatHistory.scrollHeight;
       }
+
+      uploadBtn.onclick = function () {
+        fileInput.click();
+      };
+
+      fileInput.onchange = async function () {
+        if (!fileInput.files.length) return;
+        const file = fileInput.files[0];
+        const formData = new FormData();
+        formData.append("file", file);
+        appendMessage("user", `Uploading: ${file.name}`);
+        try {
+          const response = await fetch("/upload", {
+            method: "POST",
+            body: formData,
+          });
+          const data = await response.json();
+        } catch (err) {
+          appendMessage("bot", `[Error] Could not upload file`);
+        }
+        fileInput.value = "";
+      };
 
       chatForm.onsubmit = async function (e) {
         e.preventDefault();
@@ -120,8 +153,8 @@
             body: JSON.stringify({ message: userMsg }),
           });
           const data = await response.json();
-          if (data.response) {
-            appendMessage("bot", data.response);
+          if (data.ok) {
+            appendMessage("bot", data.message);
           } else if (data.error) {
             appendMessage("bot", "[Error] " + data.error);
           } else {

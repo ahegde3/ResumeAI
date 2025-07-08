@@ -40,3 +40,6 @@ coverage/
 # Local environment
 .env.*
 .envrc 
+
+
+/uploads

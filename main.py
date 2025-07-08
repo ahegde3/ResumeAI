@@ -1,10 +1,19 @@
-from fastapi import FastAPI, UploadFile, Form, Request
+from fastapi import FastAPI, UploadFile, Form, Request,File
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 from chatbot import get_agent
+from pathlib import Path
+from typing import Optional
+from fastapi import HTTPException, status
+from pydantic import BaseModel
+
 
 app = FastAPI()
 agent = get_agent()
 message_history = []
+
+# Create uploads directory if it doesn't exist
+UPLOAD_DIR = Path("uploads")
+UPLOAD_DIR.mkdir(exist_ok=True)
 
 @app.get("/", response_class=HTMLResponse)
 def serve_ui():
@@ -36,3 +45,41 @@ async def chat_endpoint(request: Request):
 @app.get("/download/")
 def download():
     return FileResponse("output.tex", filename="edited_resume.tex", media_type="text/plain")
+
+
+@app.post("/upload")
+async def upload_file(
+    file: UploadFile = File(...),
+    message: Optional[str] = Form(""),
+):
+    """
+    Upload a file and optionally process it with the LLM.
+    """
+    try:
+        # Get or create a chat session
+
+        
+        # Save the file
+        file_id = f"{file.filename}"
+        file_path = UPLOAD_DIR / file_id
+        
+        # Write file content
+        with open(file_path, "wb") as f:
+            content = await file.read()
+            f.write(content)
+            await file.seek(0)  # Reset file pointer for potential reuse
+        
+        # Add file reference to the chat session
+        file_message = f"Uploaded file: {file.filename}"
+        print(file_message)
+        
+
+
+        return {"message": "File uploaded successfully"}
+        
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error processing file: {str(e)}"
+        )
