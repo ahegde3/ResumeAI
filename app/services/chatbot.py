@@ -2,12 +2,12 @@ from langchain_openai import ChatOpenAI
 from langchain.agents import tool, initialize_agent
 from langchain.memory import ConversationBufferMemory
 from dotenv import load_dotenv
-from llm_handler import LLMHandler
-from prompt import get_system_prompt
+from app.services.llm_handler import LLMHandler
+from app.services.prompt import get_system_prompt
 import os
 load_dotenv()
 
-from resume_editor import change_email, change_name, change_location
+from app.services.resume_editor import change_email, change_name, change_location
 
 from pathlib import Path
 import mimetypes

@@ -1,44 +1,36 @@
 import os
-from fastapi import FastAPI, UploadFile, Form, Request,File
-from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
-from chatbot import get_agent , chat_with_bot
-from pathlib import Path
+from fastapi import APIRouter, HTTPException, status
+from fastapi import Request, File, Form, UploadFile
+from fastapi.responses import JSONResponse
 from typing import Optional
-from fastapi import HTTPException, status
-from pydantic import BaseModel
-from resume_editor import extract_resume_info
-from chatbot import extract_file_content
+from pathlib import Path
+from app.services.chatbot import chat_with_bot ,extract_file_content, get_agent
+from app.services.resume_editor import extract_resume_info
 
 
 
 
 
-app = FastAPI()
+router = APIRouter(tags=["api"])
+
+
 agent = get_agent()
-message_history = []
 
 # Create uploads directory if it doesn't exist
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 
-@app.get("/", response_class=HTMLResponse)
-def serve_ui():
-    with open("static/index.html") as f:
-        return f.read()
 
-@app.post("/edit/")
-async def edit_resume(file: UploadFile, command: str = Form(...)):
-    latex = (await file.read()).decode()
-    # Pass user command and latex to the agent
-    result = agent.run({
-        "input": f"{latex},{command}"
-    })
-    # Save result to file to serve for download
-    with open("output.tex", "w") as f:
-        f.write(result)
-    return {"latex": result}
 
-@app.post("/chat")
+@router.get("/health")
+async def health_check():
+    """
+    Health check endpoint.
+    """
+    return {"status": "ok"}
+
+
+@router.post("/chat")
 async def chat_endpoint(request: Request):
     data = await request.json()
     user_message = data.get("message", "").strip()
@@ -51,12 +43,8 @@ async def chat_endpoint(request: Request):
     print(response)
     return {"response": response}
 
-@app.get("/download/")
-def download():
-    return FileResponse("output.tex", filename="edited_resume.tex", media_type="text/plain")
 
-
-@app.post("/upload")
+@router.post("/upload")
 async def upload_file(
     file: UploadFile = File(...),
     message: Optional[str] = Form(""),
@@ -85,17 +73,16 @@ async def upload_file(
 
 
         return {"message": "File uploaded successfully"}
-        
-        
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error processing file: {str(e)}"
         )
+    
 
-@app.get("/resume_info")
+@router.get("/resume_info")
 def resume_info():
-    resume_content = extract_file_content(os.path.join("uploads", "main.tex"))
-    print(resume_content)
+    resume_content = extract_file_content(os.path.join("app/uploads", "main.tex"))
+
     resume_info = extract_resume_info(resume_content)
     return resume_info

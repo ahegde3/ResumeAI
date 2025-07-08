@@ -129,7 +129,7 @@
         formData.append("file", file);
         appendMessage("user", `Uploading: ${file.name}`);
         try {
-          const response = await fetch("/upload", {
+          const response = await fetch("/api/upload", {
             method: "POST",
             body: formData,
           });
@@ -147,7 +147,7 @@
         appendMessage("user", userMsg);
         chatInput.value = "";
         try {
-          const response = await fetch("/chat", {
+          const response = await fetch("/api/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message: userMsg }),

@@ -1,7 +1,7 @@
 import re
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
-from llm_handler import LLMHandler
+from app.services.llm_handler import LLMHandler
 
 def change_email(latex, new_email):
     return re.sub(r'\\email\{[^\}]*\}', f'\\email{{{new_email}}}', latex)
