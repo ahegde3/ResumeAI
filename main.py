@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI, UploadFile, Form, Request,File
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 from chatbot import get_agent , chat_with_bot
@@ -5,6 +6,11 @@ from pathlib import Path
 from typing import Optional
 from fastapi import HTTPException, status
 from pydantic import BaseModel
+from resume_editor import extract_resume_info
+from chatbot import extract_file_content
+
+
+
 
 
 app = FastAPI()
@@ -86,3 +92,10 @@ async def upload_file(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error processing file: {str(e)}"
         )
+
+@app.get("/resume_info")
+def resume_info():
+    resume_content = extract_file_content(os.path.join("uploads", "main.tex"))
+    print(resume_content)
+    resume_info = extract_resume_info(resume_content)
+    return resume_info

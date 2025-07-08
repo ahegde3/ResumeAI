@@ -148,9 +148,9 @@ def extract_file_content(file_path: str, max_length: int = 10000) -> str:
     
     mime_type, _ = mimetypes.guess_type(file_path)
     
-    # Text files
-    if mime_type in ['text/plain', 'text/markdown', 'application/json', 'text/html', 'text/css', 'text/javascript'] or file_path.suffix in ['.txt', '.md', '.json', '.html', '.css', '.js', '.py', '.java', '.c', '.cpp', '.h', '.ts', '.tsx', '.jsx']:
-        with aiofiles.open(file_path, 'r', errors='ignore') as f:
+    # Text files (including .tex)
+    if mime_type in ['text/plain', 'text/markdown', 'application/json', 'text/html', 'text/css', 'text/javascript'] or file_path.suffix in ['.txt', '.md', '.json', '.html', '.css', '.js', '.py', '.java', '.c', '.cpp', '.h', '.ts', '.tsx', '.jsx', '.tex']:
+        with open(file_path, 'r', errors='ignore') as f:
             content = f.read()
             return content[:max_length]
     
