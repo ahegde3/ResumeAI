@@ -153,8 +153,8 @@
             body: JSON.stringify({ message: userMsg }),
           });
           const data = await response.json();
-          if (data.ok) {
-            appendMessage("bot", data.message);
+          if (data.response) {
+            appendMessage("bot", data.response);
           } else if (data.error) {
             appendMessage("bot", "[Error] " + data.error);
           } else {

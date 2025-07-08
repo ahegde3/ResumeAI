@@ -3,7 +3,7 @@ from langchain.agents import tool, initialize_agent
 from langchain.memory import ConversationBufferMemory
 from dotenv import load_dotenv
 from llm_handler import LLMHandler
-
+from prompt import get_system_prompt
 load_dotenv()
 
 from resume_editor import change_email, change_name, change_location
@@ -43,7 +43,8 @@ def tool_chat(message: str):
     Respond conversationally to the user.
     Use this tool for all general questions, greetings, or when the user is not asking to edit the resume.
     """
-    response = llm_chat.invoke(message)
+    system_prompt = get_system_prompt()
+    response = llm_chat.invoke(message,system_prompt=system_prompt)
     # If response is a Message object, extract the content
     if hasattr(response, "content"):
         return response.content
