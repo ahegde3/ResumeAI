@@ -11,19 +11,26 @@ import shutil
 import os
 import subprocess
 import tempfile
+from app.utils.file import extract_file_content
 
-def change_email(latex, new_email):
-    return re.sub(r'\\email\{[^\}]*\}', f'\\email{{{new_email}}}', latex)
 
-def change_name(latex, new_name):
-    return re.sub(r'\\name\{[^\}]*\}', f'\\name{{{new_name}}}', latex)
 
-def change_location(latex, new_location):
-    return re.sub(r'\\location\{[^\}]*\}', f'\\location{{{new_location}}}', latex)
+def change_email( new_email):
+    resume_info.email = new_email
+    print(resume_info)
+    # return re.sub(r'\\email\{[^\}]*\}', f'\\email{{{new_email}}}', latex)
+
+def change_name(new_name):
+    resume_info.name = new_name
+    # return re.sub(r'\\name\{[^\}]*\}', f'\\name{{{new_name}}}', latex)
+
+def change_location(new_location):
+    resume_info.location = new_location
+    # return re.sub(r'\\location\{[^\}]*\}', f'\\location{{{new_location}}}', latex)
 
 
 RESUME = {
-  "name": "Anish Hegde",
+  "name": "Raj Hegde",
   "location": "Boston, MA",
   "phone": "+1 (857)-313-4739",
   "email": "hegde.anis@northeastern.edu",
@@ -53,7 +60,11 @@ RESUME = {
       "title": "Software Developer(Co-op)",
       "startDate": "Jul 2024",
       "endDate": "Dec 2024",
-      "description": "Enhanced researcher efficiency by  47% by developing  UI in React for complex data visualization and interaction. Boosted application performance by 65% (targeting a reduction in load time from 10s to 3.5s) by implementing Redis caching and asynchronous programming patterns. Tasked with devising and implementing a robust data persistence strategy, integrating local storage with backend caching to ensure a fluid and uninterrupted user experience across multiple sessions."
+      "description": [
+        "Enhanced researcher efficiency by 47\% by developing UI in React for complex data visualization and interaction.",
+        "Boosted application performance by 65\% (targeting a reduction in load time from 10s to 3.5s) by implementing Redis caching and asynchronous programming patterns.",
+        "Devised and implemented a robust data persistence strategy, integrating local storage with backend caching to ensure a fluid and uninterrupted user experience across multiple sessions."
+      ]
     },
     {
       "company": "Toddle",
@@ -62,7 +73,11 @@ RESUME = {
       "title": "Software Engineer Backend",
       "startDate": "Apr 2023",
       "endDate": "Aug 2023",
-      "description": "Expanded backend API capabilities by developing and deploying over 15 new GraphQL resolvers and mutations within an AWS Lambda-based serverless microservice architecture. Strengthened application security and protected critical data by implementing GraphQL Shield rules, engineering custom authorization for sensitive mutations, and resolving Dataloader caching vulnerabilities. Cut backend latency by 18% for critical data endpoints by analyzing query execution plans to identify bottlenecks, rewriting inefficient SQL queries, and implementing strategic database indexes."
+      "description": [
+        "Expanded backend API capabilities by developing and deploying over 15 new GraphQL resolvers and mutations within an AWS Lambda-based serverless microservice architecture.",
+        "Strengthened application security and protected critical data by implementing GraphQL Shield rules, engineering custom authorization for sensitive mutations, and resolving Dataloader caching vulnerabilities.",
+        "Cut backend latency by 18\% for critical data endpoints by analyzing query execution plans to identify bottlenecks, rewriting inefficient SQL queries, and implementing strategic database indexes."
+      ]
     },
     {
       "company": "Weekday (YC W21)",
@@ -71,7 +86,11 @@ RESUME = {
       "title": "FullStack Engineer",
       "startDate": "Jun 2022",
       "endDate": "Feb 2023",
-      "description": "Enhanced platform functionality by delivering multiple end-to-end features, which involved scoping requirements, developing REST APIs (Node.js, Express), and translating Figma mockups into functional React UI components. Reduced average time to hire candidates by 2 weeks (28%) by leading the development of a new candidate inbound sourcing strategy. Boosted candidate engagement and response rates by 25% by engineering a unified messaging system that consolidated communication over different channels into a single contextual view for recruiters."
+      "description": [
+        "Enhanced platform functionality by delivering multiple end-to-end features, which involved scoping requirements, developing REST APIs (Node.js, Express), and translating Figma mockups into functional React UI components.",
+        "Reduced average time to hire candidates by 2 weeks (28\%) by leading the development of a new candidate inbound sourcing strategy.",
+        "Boosted candidate engagement and response rates by 25\% by engineering a unified messaging system that consolidated communication over different channels into a single contextual view for recruiters."
+      ]
     },
     {
       "company": "Merkle",
@@ -80,7 +99,11 @@ RESUME = {
       "title": "Software Engineer",
       "startDate": "Sep 2020",
       "endDate": "May 2022",
-      "description": "Achieved $7,000 in monthly AWS EC2 and proxy cost savings by designing and implementing a high-volume NodeJS-based web crawling product (processing 300,000 URLs daily from 110+ retailers) and re-architecting Kafka message consumption from a push to a pull-based model for improved performance. Resolved critical performance bottlenecks and stability issues, cutting CPU usage by 37% and eliminating 100% of message-related server crashes, by executing an architectural shift in Kafka consumption model. Reduced analyst workflow effort by 34% by conceptualizing and building an internal React-based Chrome Extension, streamlining data access and manipulation tasks."
+      "description": [
+        "Achieved \$7,000 in monthly AWS EC2 and proxy cost savings by designing and implementing a high-volume NodeJS-based web crawling product (processing 300,000 URLs daily from 110+ retailers) and re-architecting Kafka message consumption from a push to a pull-based model for improved performance.",
+        "Resolved critical performance bottlenecks and stability issues, cutting CPU usage by 37\% and eliminating 100\% of message-related server crashes, by executing an architectural shift in Kafka consumption model.",
+        "Reduced analyst workflow effort by 34\% by conceptualizing and building an internal React-based Chrome Extension, streamlining data access and manipulation tasks."
+      ]
     }
   ]
 }
@@ -141,7 +164,7 @@ prompt = PromptTemplate.from_template(template)
 chain = LLMChain(llm=llm_extractor, prompt=prompt)
 
 
-def extract_resume_info(resume: str):
+def extract_resume_info(resume: str = None):
     # response = chain.run(resume=resume)
     # # Remove Markdown code block markers if present
     # if response.strip().startswith('```'):
@@ -157,7 +180,7 @@ def extract_resume_info(resume: str):
     return resume
 
 
-def resume_to_latex(resume: Resume) -> str:
+def resume_to_latex() -> str:
     """
     Render the Resume model as a LaTeX string using the uploads/main.tex template.
     """
@@ -171,8 +194,9 @@ def resume_to_latex(resume: Resume) -> str:
         comment_end_string='}',
         autoescape=False
     )
+    print(resume_info)
     template = env.get_template('main.tex')
-    return template.render(resume=resume)
+    return template.render(resume=resume_info)
 
 
 def write_latex_resume(latex: str, output_path: str = 'app/uploads/main2.tex'):
@@ -238,3 +262,6 @@ def latex_to_pdf(latex_str, output_path='output.pdf'):
         generated_pdf = os.path.join(temp_dir, 'document.pdf')
         os.replace(generated_pdf, output_path)
         print(f"PDF generated at: {output_path}")
+
+
+resume_info = extract_resume_info(None)

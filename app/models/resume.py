@@ -15,7 +15,7 @@ class ExperienceEntry(BaseModel):
     title: str = ""
     startDate: str = ""
     endDate: str = ""
-    description: str = ""
+    description: List[str] = Field(default_factory=list)
 
 class Resume(BaseModel):
     name: str = ""
@@ -26,3 +26,4 @@ class Resume(BaseModel):
     githubUrl: str = ""
     education: List[EducationEntry] = Field(default_factory=list)
     experience: List[ExperienceEntry] = Field(default_factory=list)
+    # projects: List[ProjectEntry] = Field(default_factory=list)

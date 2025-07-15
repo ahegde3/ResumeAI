@@ -21,27 +21,28 @@ llm_chat = LLMHandler().model
 def parse_args(args: str) -> list[str]:
     return [a.strip() for a in args.split(",")]
 
-@tool("Change Email")
-def tool_change_email(args: str):
-    "Change email in resume. Input should be: latex,new_email"
-    latex, email = parse_args(args)
-    return change_email(latex, email)
+@tool("Change Email", return_direct=True)
+def tool_change_email(email: str):
+    """Change email in resume. Input should be: new_email"""
+    print("email", email)
+    change_email(email)
+    return "Email Id changed in resume"
 
-@tool("Change Name")
-def tool_change_name(args: str):
+@tool("Change Name", return_direct=True)
+def tool_change_name(name: str):
     """
     Changes the name in the uploaded LaTeX resume.
-    Input should be: latex,new_name
+    Input should be: new_name
     Only use this tool if the user explicitly asks to update or change the name in their resume document.
     """
-    latex, name = parse_args(args)
-    return change_name(latex, name)
+    change_name(name)
+    return "Name changed in resume"
 
-@tool("Change Location")
-def tool_change_location(args: str):
-    "Change location in resume. Input should be: latex,new_location"
-    latex, location = parse_args(args)
-    return change_location(latex, location)
+@tool("Change Location", return_direct=True)
+def tool_change_location(location: str):
+    """Change location in resume. Input should be: new_location"""
+    change_location(location)
+    return "Location changed in resume"
 
 
 @tool("Chat", return_direct=True)
@@ -83,10 +84,10 @@ def tool_get_updated_resume(message: str):
     # Get the latest LaTeX file content
     latex_content = extract_file_content("app/uploads/main.tex")
     # Extract the latest Resume model
-    resume = extract_resume_info(latex_content)
-    print(resume)
+    # resume = extract_resume_info(latex_content)
+    # print(resume)
     # Render to LaTeX using the template
-    latex = resume_to_latex(resume)
+    latex = resume_to_latex()
     latex_to_pdf(latex, "app/uploads/resume.pdf")
     return "DOne"
 
