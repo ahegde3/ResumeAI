@@ -299,3 +299,7 @@ def latex_to_pdf(latex_str, output_path='output.pdf'):
 
 
 resume_info = extract_resume_info(None)
+
+
+def get_resume_info():
+    return resume_info

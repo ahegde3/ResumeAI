@@ -1,3 +1,4 @@
+import json
 from langchain_openai import ChatOpenAI
 from langchain.agents import tool, initialize_agent
 from langchain.memory import ConversationBufferMemory
@@ -8,7 +9,7 @@ from app.services.prompt import get_system_prompt
 from app.utils.file import get_latest_uploaded_file_content
 
 
-from app.services.resume_editor import change_email, change_name, change_location, extract_resume_info, resume_to_latex ,latex_to_pdf
+from app.services.resume_editor import change_email, change_name, change_location, extract_resume_info, resume_to_latex ,latex_to_pdf,get_resume_info
 from app.utils.file import extract_file_content
 
 load_dotenv()
@@ -52,29 +53,7 @@ def tool_chat(message: str):
     Use this tool for all general questions, greetings, or when the user is not asking to edit the resume.
     """
     return "CHAT"
-    # resume_content = get_latest_uploaded_file_content()
-    # base_prompt = get_system_prompt()
-    # if resume_content:
-    #     system_prompt = (
-    #         base_prompt
-    #         + "\n\nThe user's uploaded resume content is below. Use this for any resume-related questions or edits:\n"
-    #         + resume_content[:-1]  # Limit for context size
-    #     )
-    # else:
-    #     system_prompt = (
-    #         base_prompt
-    #         + "\n\nNote: The user has not uploaded a resume yet. If asked about the resume, politely inform the user to upload one."
-    #     )
 
-    # response = llm_chat.invoke(message, system_prompt=system_prompt)
-    # # If response is a Message object, extract the content
-    # if hasattr(response, "content"):
-    #     return response.content
-    # # If response is a dict, extract the 'content' key
-    # if isinstance(response, dict) and "content" in response:
-    #     return response["content"]
-    # # Otherwise, just return as string
-    # return str(response)
 
 @tool("Get Updated Resume", return_direct=True)
 def tool_get_updated_resume(message: str):
@@ -92,25 +71,29 @@ def tool_get_updated_resume(message: str):
     return "DOne"
 
 
+
+
 def chat_with_bot(message: str):
-    resume_content = get_latest_uploaded_file_content()
+    resume_content = get_resume_info()
     base_prompt = get_system_prompt()
     if resume_content:
+        resume_json = json.dumps(resume_content.dict(), indent=2)
         system_prompt = (
             base_prompt
-            + "\n\n---\nUSER RESUME (for your reference):\n"
-            + resume_content
+            + "\n\n---\nUSER RESUME INFORMATION :\n"
+            + resume_json
             + "\n---\n"
-            + "When the user asks about their resume, use the above content. Do NOT ask the user to paste their resume again."
+            + "ALWAYS use the above USER RESUME INFORMATION when answering questions about the user's resume." 
+            + "NEVER say you don't have the resume. If the user asks about their resume, refer to the above content."
         )
     else:
         system_prompt = (
             base_prompt
             + "\n\nNote: The user has not uploaded a resume yet. If asked about the resume, politely inform the user to upload one."
         )
-    
 
-    response = llm_chat.invoke(message, system_prompt=system_prompt)
+    input_message= [("system", system_prompt), ("user", message)]
+    response = llm_chat.invoke(input_message)
     # If response is a Message object, extract the content
     if hasattr(response, "content"):
         return response.content
