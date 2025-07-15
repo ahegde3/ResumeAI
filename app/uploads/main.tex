@@ -20,23 +20,11 @@
 \usepackage{tabularx}
 \usepackage{fontawesome5}
 \usepackage{multicol}
+\usepackage{setspace}
 
 \setlength{\multicolsep}{-3.0pt}
 \setlength{\columnsep}{-1pt}
-\input{glyphtounicode}
-
-
-%----------FONT OPTIONS----------
-% sans-serif
-% \usepackage[sfdefault]{FiraSans}
-% \usepackage[sfdefault]{roboto}
-% \usepackage[sfdefault]{noto-sans}
-% \usepackage[default]{sourcesanspro}
-
-% serif
-% \usepackage{CormorantGaramond}
-% \usepackage{charter}
-
+%\input{glyphtounicode} % Remove if not needed
 
 \pagestyle{fancy}
 \fancyhf{} % clear all header and footer fields
@@ -51,7 +39,6 @@
 \addtolength{\topmargin}{-.7in}
 \addtolength{\textheight}{1.3in}
 
-
 \urlstyle{same}
 
 \raggedbottom
@@ -63,7 +50,6 @@
   \vspace{-8pt}\scshape\raggedright\large\bfseries
 }{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
 
-% Ensure that generate pdf is machine readable/ATS parsable
 \pdfgentounicode=1
 
 %-------------------------
@@ -102,159 +88,103 @@
     \end{tabular*}\vspace{-7pt}
 }
 
-
 \newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
 
 \renewcommand\labelitemi{$\vcenter{\hbox{\tiny$\bullet$}}$}
 \renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
 
-\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.0in, label={}]}
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.0in, label={}]} 
 \newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
 \newcommand{\resumeItemListStart}{\begin{itemize}}
 \newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
 
-
-\usepackage{setspace}
 \setstretch{1}
-
 
 %-------------------------------------------
 %%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
 \begin{document}
 
 %----------HEADING----------
-
-
 \begin{center}
     {\Huge \scshape Anish Hegde} \\ \vspace{1pt}
-   % India \\ \vspace{1pt}
-   \hspace{1cm}
-   \small \raisebox{-0.1\height}Boston, MA \vert 
-    \small \raisebox{-0.1\height}\ {+1 (857)\textendash313\textendash4739\space }  \vert \href{mailto:hegde.anis@northeastern.edu}
-    \small \raisebox{-0.1\height} \space 
-    % {\underline{\textup{ahegde3@outlook.com}}\vert  
-    {\underline{\textup{hegde.anis@northeastern.edu}}\vert  
-    \href{https://www.linkedin.com/in/ahegde3//}{\raisebox{-0.2\height}\
-    \underline{ \textup{linkedin.com/in/ahegde3}}} \vert
-    \href{https://github.com/ahegde3}{\raisebox{-0.2\height}\ \underline{ \textup{github.com/ahegde3}}}
+    {\small Boston, MA \quad\textbar\quad +1 (857)\textendash313\textendash4739 \quad\textbar\quad
+    \href{mailto:hegde.anis@northeastern.edu}{\underline{hegde.anis@northeastern.edu}} \quad\textbar\quad
+    \href{https://www.linkedin.com/in/ahegde3/}{\underline{linkedin.com/in/ahegde3}} \quad\textbar\quad
+    \href{https://github.com/ahegde3}{\underline{github.com/ahegde3}}}
     \vspace{-8pt}
 \end{center}
 
 \vspace{2pt}
-% \begin{center}
-%     &  \textbf{Available from May 2024 -- Dec 2024 for  internships/Co-ops.}
-% \end{center}
 
 %------Technical Skill-------
 \section*{Technical Skills}
 \begin{itemize}[leftmargin=0.05in, label={}]
- \small{\item{
-     \textbf{Programming Languages}{ :\hspace{1.6pt}  Python, JavaScript/TypeScript, Java, C#, .NET, C/C++\\} \\
+ \item[] {\small
+     \textbf{Programming Languages}{: Python, JavaScript/TypeScript, Java, C\#, .NET, C/C++} \\
      \textbf{Frontend}{: React, Next.js, Redux, HTML5, CSS, Tailwind} \\
-     \textbf{Backend}{ : Node.js, Express, FastAPI, Flask, Apache Kafka, GraphQL, REST, gRPC} \\
-     \textbf{Cloud \& DevOps}{ :  Azure, Google Cloud Platform, Docker, CI/CD, Github Actions, Nginx, Terraform } \\
-    \textbf{Databases and tools }{:  PostgreSQL, MySQL, MongoDb, ElasticSearch, Redis} \\
-    \textbf{Concepts }{:  Microservices, SCRUM, Event driven Architecture, Test-Driven Development} \\
+     \textbf{Backend}{: Node.js, Express, FastAPI, Flask, Apache Kafka, GraphQL, REST, gRPC} \\
+     \textbf{Cloud \& DevOps}{: Azure, Google Cloud Platform, Docker, CI/CD, Github Actions, Nginx, Terraform} \\
+     \textbf{Databases and tools}{: PostgreSQL, MySQL, MongoDb, ElasticSearch, Redis} \\
+     \textbf{Concepts}{: Microservices, SCRUM, Event driven Architecture, Test-Driven Development}
+ }
+\end{itemize}
+\vspace{-14pt}
 
- \end{itemize}
- \vspace{-14pt}
 %-----------EDUCATION-----------
 \section*{Education}
   \resumeSubHeadingListStart
   \resumeSubheading
       {Khoury College Of Computer Science - Northeastern University}{Sep 2023 - Dec 2025}
       {Master of Science in Computer Science}{Boston,MA}
-
-      % { \textbf{Relevant Coursework}: Cloud Computing with AWS, Machine Learning Operations, Foundations of Artificial Intelligence}{}
     \resumeSubheading
       {Manipal Institute Of Technology}{Aug 2016 - Jul 2020}
       {Bachelor of Technology in Information Technology}{Manipal,India}
   \resumeSubHeadingListEnd
 
-
- % Adjust the space between sections (reduce space)
-\vspace{-5pt} % Adjust the value as needed
+\vspace{-5pt}
 %-----------EXPERIENCE-----------
 \section*{Experience}
   \resumeSubHeadingListStart
     \resumeSubheading
       {Wave Life Sciences}{Jul 2024 - Dec 2024} {Software Developer(Co-op)}{Cambridge,MA}
       \resumeItemListStart
-          \resumeItem{Enhanced researcher efficiency by  47\% by developing  UI in React for complex data visualization and interaction.}
-         \resumeItem{Boosted application performance by 65\% (targeting a reduction in load time from 10s to 3.5s) by implementing Redis caching and asynchronous programming patterns.}
-        \resumeItem{Tasked with devising and implementing a robust data persistence strategy, integrating local storage with backend caching to ensure a fluid and uninterrupted user experience across multiple sessions.}    
-    \resumeItemListEnd
-    
-  \resumeSubheading
-  {Toddle}{Apr 2023 - Aug 2023} {Software Engineer Backend}{Remote,India}
-  \resumeItemListStart
-     \resumeItem{Expanded backend API capabilities by developing and deploying over 15 new GraphQL resolvers and mutations within an AWS Lambda-based serverless microservice architecture.}
-      \resumeItem{Strengthened application security and protected critical data by implementing GraphQL Shield rules, engineering custom authorization for sensitive mutations, and resolving Dataloader caching vulnerabilities.}
-      \resumeItem{Cut backend latency by 18\% for critical data endpoints by analyzing query execution plans to identify bottlenecks, rewriting inefficient SQL queries, and implementing strategic database indexes.}
+          \resumeItem{Enhanced researcher efficiency by 47\% by developing UI in React for complex data visualization and interaction.}
+          \resumeItem{Boosted application performance by 65\% (targeting a reduction in load time from 10s to 3.5s) by implementing Redis caching and asynchronous programming patterns.}
+          \resumeItem{Tasked with devising and implementing a robust data persistence strategy, integrating local storage with backend caching to ensure a fluid and uninterrupted user experience across multiple sessions.}
       \resumeItemListEnd
-
     \resumeSubheading
-      {Weekday (YC W21) }{Jun 2022 - Feb 2023} {FullStack Engineer}{Remote,India}
+      {Toddle}{Apr 2023 - Aug 2023} {Software Engineer Backend}{Remote,India}
       \resumeItemListStart
-         \resumeItem{Enhanced platform functionality by delivering multiple end-to-end features, which involved scoping requirements, developing REST APIs (Node.js, Express), and translating Figma mockups into functional React UI components.}
-        \resumeItem{Reduced average time to hire candidates by 2 weeks (28\%) by leading the development of a new candidate inbound sourcing strategy.}
-        \resumeItem{Boosted candidate engagement and response rates by 25\% by engineering a unified messaging system that consolidated communication over different channels into a single contextual view for recruiters.}
+          \resumeItem{Expanded backend API capabilities by developing and deploying over 15 new GraphQL resolvers and mutations within an AWS Lambda-based serverless microservice architecture.}
+          \resumeItem{Strengthened application security and protected critical data by implementing GraphQL Shield rules, engineering custom authorization for sensitive mutations, and resolving Dataloader caching vulnerabilities.}
+          \resumeItem{Cut backend latency by 18\% for critical data endpoints by analyzing query execution plans to identify bottlenecks, rewriting inefficient SQL queries, and implementing strategic database indexes.}
       \resumeItemListEnd
-      
     \resumeSubheading
-      {Merkle }{Sep 2020 - May 2022} {Software Engineer}{Mumbai,India}
+      {Weekday (YC W21)}{Jun 2022 - Feb 2023} {FullStack Engineer}{Remote,India}
       \resumeItemListStart
-        \resumeItem{Achieved \$7,000 in monthly AWS EC2 and proxy cost savings by designing and implementing a high-volume NodeJS-based web crawling product (processing 300,000 URLs daily from 110+ retailers) and re-architecting Kafka message consumption from a push to a pull-based model for improved performance.}
-        \resumeItem{Resolved critical performance bottlenecks and stability issues, cutting CPU usage by 37\% and eliminating 100\% of message-related server crashes, by executing an architectural shift in Kafka consumption  model.}
-        \resumeItem{Reduced analyst workflow effort by 34\% by conceptualizing and building an internal React-based Chrome Extension, streamlining data access and manipulation tasks.}
+          \resumeItem{Enhanced platform functionality by delivering multiple end-to-end features, which involved scoping requirements, developing REST APIs (Node.js, Express), and translating Figma mockups into functional React UI components.}
+          \resumeItem{Reduced average time to hire candidates by 2 weeks (28\%) by leading the development of a new candidate inbound sourcing strategy.}
+          \resumeItem{Boosted candidate engagement and response rates by 25\% by engineering a unified messaging system that consolidated communication over different channels into a single contextual view for recruiters.}
       \resumeItemListEnd
-
-
-    
-
+    \resumeSubheading
+      {Merkle}{Sep 2020 - May 2022} {Software Engineer}{Mumbai,India}
+      \resumeItemListStart
+          \resumeItem{Achieved \$7,000 in monthly AWS EC2 and proxy cost savings by designing and implementing a high-volume NodeJS-based web crawling product (processing 300,000 URLs daily from 110+ retailers) and re-architecting Kafka message consumption from a push to a pull-based model for improved performance.}
+          \resumeItem{Resolved critical performance bottlenecks and stability issues, cutting CPU usage by 37\% and eliminating 100\% of message-related server crashes, by executing an architectural shift in Kafka consumption model.}
+          \resumeItem{Reduced analyst workflow effort by 34\% by conceptualizing and building an internal React-based Chrome Extension, streamlining data access and manipulation tasks.}
+      \resumeItemListEnd
   \resumeSubHeadingListEnd
-% \vspace{-15pt}
 
- % {Programming Language}
-    %\resumeSubHeadingListStart
-        % \begin{multicols}{4}
-        %     \begin{itemize}[itemsep=-5pt, parsep=3pt]
-        %         \item\small Data Structures
-        %         \item AWS/GCP
-        %         \item Python/C++/Javascript
-        %         \item NodeJS
-        %         \item ReactJS
-        %         \item SQL/No-SQL DB
-        %          \item Git version control
-        %     \end{itemize}
-        % \end{multicols}
-        % \vspace*{2.0\multicolsep}
-    %\resumeSubHeadingListEnd
-
-
-
-%-----------INVOLVEMENT---------------
+%-----------PROJECTS---------------
 \section*{Projects}
 \resumeSubHeadingListStart
-        % \resumeSubheading{Image Processor }{10/23 -- 12/23}{Java, JUnit}{}
-        %  \resumeItemListStart
-        %    \resumeItem{Created an image processing application capable of performing various transformation on the image like Sepia, Luma and blurring etc. User interacted with the application using the GUI built using Java Swing }
-        %    \resumeItem{The project focused on incorporating various Object oriented design  concepts and applying common design  patterns such as factory and builder.}
-        %    \resumeItem{The application was  extensively unit tested using JUnit.}
-        %  \resumeItemListEnd 
-     % \resumeSubheading{Job Management System}{Oct 2023 -- Nov 2023}{Java,Spring boot, React, MySQL}{}
-     %     \resumeItemListStart
-     %       \resumeItem{Engineered a job management system using Java Spring boot and ReactJs.}
-     %        \resumeItem{This service interacted with AWS RDS MYSQL database and used AWS Elastic Beanstalk for deployment.}
-     %       \resumeItem{The project focused on incorporating  Object oriented design  concepts and applying common design  patterns along with test driven development.}
-     %     \resumeItemListEnd 
-        \resumeSubheading{AI Teaching Assistant bot}{Jan 2024 - Present}{NextJs, FastAPI, Cloud Run,Pub/Sub, LLM}{}
-       \resumeItemListStart
-       \resumeItem{Engineered a scalable MLOps pipeline capable of processing videos of unlimited length, overcoming the previous 10-minute hard limit, by migrating the core workflow to an asynchronous, Pub/Sub-triggered architecture on GCP.}
-       \resumeItem{Improved student comprehension and retention rates by  30\% , engineering an innovative interactive chatbot service designed to enhance learner engagement with video lecture content.}
-        \resumeItemListEnd 
-    \resumeSubHeadingListEnd
+    \resumeSubheading{AI Teaching Assistant bot}{Jan 2024 - Present}{NextJs, FastAPI, Cloud Run,Pub/Sub, LLM}{}
+    \resumeItemListStart
+        \resumeItem{Engineered a scalable MLOps pipeline capable of processing videos of unlimited length, overcoming the previous 10-minute hard limit, by migrating the core workflow to an asynchronous, Pub/Sub-triggered architecture on GCP.}
+        \resumeItem{Improved student comprehension and retention rates by 30\%, engineering an innovative interactive chatbot service designed to enhance learner engagement with video lecture content.}
+    \resumeItemListEnd
+\resumeSubHeadingListEnd
+
 \vspace{-8pt}
 \end{document}

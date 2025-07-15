@@ -8,7 +8,8 @@ from app.services.prompt import get_system_prompt
 from app.utils.file import get_latest_uploaded_file_content
 
 
-from app.services.resume_editor import change_email, change_name, change_location
+from app.services.resume_editor import change_email, change_name, change_location, extract_resume_info, resume_to_latex ,latex_to_pdf
+from app.utils.file import extract_file_content
 
 load_dotenv()
 
@@ -74,6 +75,22 @@ def tool_chat(message: str):
     # # Otherwise, just return as string
     # return str(response)
 
+@tool("Get Updated Resume", return_direct=True)
+def tool_get_updated_resume(message: str):
+    """
+    Return the updated resume in LaTeX format using the latest Resume model data. Accepts a single string argument (user message) as required by ChatAgent.
+    """
+    # Get the latest LaTeX file content
+    latex_content = extract_file_content("app/uploads/main.tex")
+    # Extract the latest Resume model
+    resume = extract_resume_info(latex_content)
+    print(resume)
+    # Render to LaTeX using the template
+    latex = resume_to_latex(resume)
+    latex_to_pdf(latex, "app/uploads/resume.pdf")
+    return "DOne"
+
+
 def chat_with_bot(message: str):
     resume_content = get_latest_uploaded_file_content()
     base_prompt = get_system_prompt()
@@ -91,7 +108,7 @@ def chat_with_bot(message: str):
             + "\n\nNote: The user has not uploaded a resume yet. If asked about the resume, politely inform the user to upload one."
         )
     
-    print(system_prompt)
+
     response = llm_chat.invoke(message, system_prompt=system_prompt)
     # If response is a Message object, extract the content
     if hasattr(response, "content"):
@@ -108,7 +125,7 @@ def get_agent():
     llm = LLMHandler().model
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
     agent = initialize_agent(
-        [tool_change_email, tool_change_name, tool_change_location, tool_chat],
+        [tool_change_email, tool_change_name, tool_change_location, tool_chat, tool_get_updated_resume],
         llm,
         agent="chat-zero-shot-react-description",
         verbose=True,
