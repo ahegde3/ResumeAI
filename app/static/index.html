@@ -86,13 +86,14 @@
       <div id="chat-history" class="chat-history"></div>
       <form id="chat-form" autocomplete="off">
         <div class="chat-input-row">
-          <input
+          <textarea
             id="chat-input"
             class="chat-input"
-            type="text"
             placeholder="Type your message..."
             required
-          />
+            rows="1"
+            style="resize: vertical"
+          ></textarea>
           <input id="file-input" type="file" style="display: none" />
           <button
             id="upload-btn"
