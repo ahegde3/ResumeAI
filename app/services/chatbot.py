@@ -80,19 +80,20 @@ def chat_with_bot(message: str):
         resume_json = json.dumps(resume_content.dict(), indent=2)
         system_prompt = (
             base_prompt
-            + "\n\n---\nUSER RESUME (for your reference):\n"
+            + "\n\n---\nUSER RESUME INFORMATION :\n"
             + resume_json
             + "\n---\n"
-            + "When the user asks about their resume, use the above content. Do NOT ask the user to paste their resume again."
+            + "ALWAYS use the above USER RESUME INFORMATION when answering questions about the user's resume." 
+            + "NEVER say you don't have the resume. If the user asks about their resume, refer to the above content."
         )
     else:
         system_prompt = (
             base_prompt
             + "\n\nNote: The user has not uploaded a resume yet. If asked about the resume, politely inform the user to upload one."
         )
-    
 
-    response = llm_chat.invoke(message, system_prompt=system_prompt)
+    input_message= [("system", system_prompt), ("user", message)]
+    response = llm_chat.invoke(input_message)
     # If response is a Message object, extract the content
     if hasattr(response, "content"):
         return response.content
