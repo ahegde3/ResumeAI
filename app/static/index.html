@@ -119,11 +119,35 @@
         msgDiv.className = `message ${sender}`;
         const bubble = document.createElement("div");
         bubble.className = "bubble";
-        bubble.textContent = text;
+        bubble.innerHTML = formatMessage(text);
         msgDiv.appendChild(bubble);
         chatHistory.appendChild(msgDiv);
         chatHistory.scrollTop = chatHistory.scrollHeight;
       }
+
+      // Format message: support line breaks, **bold**, *italic*
+      function formatMessage(text) {
+        if (!text) return "";
+        let html = text
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+        // Bold: **text**
+        html = html.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
+        // Italic: *text*
+        html = html.replace(/\*(.*?)\*/g, "<i>$1</i>");
+        // Line breaks
+        html = html.replace(/\n/g, "<br>");
+        return html;
+      }
+
+      // Submit on Enter, new line on Shift+Enter
+      chatInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          chatForm.requestSubmit();
+        }
+      });
 
       uploadBtn.onclick = function () {
         fileInput.click();
