@@ -104,10 +104,8 @@
 %----------HEADING----------
 \begin{center}
     {\Huge \scshape \VAR{resume.name}} \\ \vspace{1pt}
-    {\small \VAR{resume.location} \quad\textbar\quad \VAR{resume.phone} \quad\textbar\quad
-    \href{mailto:\VAR{resume.email}}{\underline{\VAR{resume.email}}} \quad\textbar\quad
-    \href{\VAR{resume.linkedinUrl}}{\underline{\VAR{resume.linkedinUrl}}} \quad\textbar\quad
-    \href{\VAR{resume.githubUrl}}{\underline{\VAR{resume.githubUrl}}}}
+    {\hspace{-30pt}}
+    {\small \VAR{resume.location} \textbar\: \VAR{resume.phone} \textbar\: \href{mailto:\VAR{resume.email}}{\underline{\VAR{resume.email}}} \textbar\: \href{\VAR{"https://www."+resume.linkedinUrl}}{\underline{\VAR{resume.linkedinUrl}}} \textbar\: \href{\VAR{"https://www."+resume.githubUrl}}{\underline{\VAR{resume.githubUrl}}}}
     \vspace{-8pt}
 \end{center}
 
@@ -119,7 +117,7 @@
 \begin{itemize}[leftmargin=0.05in, label={}]
  \item[] {\small
 \BLOCK{ for skill in resume.technicalSkills }
-    \textbf{\VAR{skill.category}}{:} \VAR{skill.items}} \\
+    \textbf{\VAR{skill.category}}{:}  \VAR{', '.join(skill.items)} \\
 \BLOCK{ endfor }
  }
 \end{itemize}

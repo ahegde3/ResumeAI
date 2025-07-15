@@ -30,12 +30,12 @@ def change_location(new_location):
 
 
 RESUME = {
-  "name": "Raj Hegde",
+  "name": "Anish Hegde",
   "location": "Boston, MA",
   "phone": "+1 (857)-313-4739",
   "email": "hegde.anis@northeastern.edu",
-  "linkedinUrl": "https://www.linkedin.com/in/ahegde3//",
-  "githubUrl": "https://github.com/ahegde3",
+  "linkedinUrl": "linkedin.com/in/ahegde3",
+  "githubUrl": "github.com/ahegde3",
   "education": [
     {
       "degree": "Master of Science in Computer Science",
@@ -105,6 +105,40 @@ RESUME = {
         "Reduced analyst workflow effort by 34\% by conceptualizing and building an internal React-based Chrome Extension, streamlining data access and manipulation tasks."
       ]
     }
+  ],
+  "projects": [
+      {
+          "name": "AI Teaching Assistant bot",
+          "startDate": "Jan 2024",
+          "endDate": "Present",
+          "tech": "NextJs, FastAPI, Cloud Run,Pub/Sub, LLM",
+          "description": [
+            "Engineered a scalable MLOps pipeline capable of processing videos of unlimited length, overcoming the previous 10-minute hard limit, by migrating the core workflow to an asynchronous, Pub/Sub-triggered architecture on GCP.",
+            "Improved student comprehension and retention rates by 30\% , engineering an innovative interactive chatbot service designed to enhance learner engagement with video lecture content."
+          ]
+      }
+  ],
+  "technicalSkills": [
+    {
+      "category": "Programming Languages",
+      "items": ["Python", "JavaScript/TypeScript", "Java", "Go", "C/C++"]
+    },
+    {
+      "category": "Frontend",
+      "items": ["React", "NextJs", "Redux", "HTML5", "CSS", "Tailwind"]
+    },
+    {
+      "category": "Backend",
+      "items": ["NodeJs", "Express", "FastAPI", "Flask", "Apache Kafka", "GraphQL", "REST", "gRPC"]
+    },
+    {
+      "category": "Cloud \& DevOps",
+      "items": ["GCP", "AWS", "Docker", "Kubernetes", "CI/CD", "Git"]
+    },
+    {
+      "category": "Database",
+      "items": ["PostgreSQL", "MySQL", "MongoDB", "Redis", "Elasticsearch", "Cassandra", "Neo4j"]
+    },
   ]
 }
 
