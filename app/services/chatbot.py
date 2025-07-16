@@ -130,12 +130,7 @@ def tool_get_updated_resume(message: str):
     """
     Return the updated resume in LaTeX format using the latest Resume model data. Accepts a single string argument (user message) as required by ChatAgent.
     """
-    # Get the latest LaTeX file content
-    latex_content = extract_file_content("app/uploads/main.tex")
-    # Extract the latest Resume model
-    # resume = extract_resume_info(latex_content)
-    # print(resume)
-    # Render to LaTeX using the template
+
     latex = resume_to_latex()
     latex_to_pdf(latex, "app/uploads/resume.pdf")
     return "DOne"
@@ -163,7 +158,9 @@ def chat_with_bot(message: str):
         )
 
     input_message= [("system", system_prompt), ("user", message)]
+    print("Resume review LLM call invoked ")
     response = llm_chat.invoke(input_message)
+    print("Resume review LLM call completed")
     # If response is a Message object, extract the content
     if hasattr(response, "content"):
         return response.content
