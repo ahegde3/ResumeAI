@@ -44,6 +44,14 @@ def change_technical_skills(category: str, items: list[str]):
         if skill.category.lower() == category.lower():
             skill.items = escaped_items
             break
+        
+def change_experience_details(company: str, description: list[str]):
+    print("company", company)
+    print("description", description)
+    for experience in resume_info.experience:
+        if experience.company.lower() == company.lower():
+            experience.description = description
+            break
 
 def change_email( new_email):
     resume_info.email = new_email

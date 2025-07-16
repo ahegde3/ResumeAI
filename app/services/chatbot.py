@@ -9,7 +9,7 @@ from app.services.prompt import get_system_prompt
 from app.utils.file import get_latest_uploaded_file_content
 
 
-from app.services.resume_editor import change_email, change_name, change_location, change_technical_skills, resume_to_latex ,latex_to_pdf,get_resume_info
+from app.services.resume_editor import change_email, change_name, change_location, change_technical_skills, resume_to_latex ,latex_to_pdf,get_resume_info, change_experience_details
 from app.utils.file import extract_file_content
 
 load_dotenv()
@@ -57,6 +57,43 @@ def tool_change_technical_skills(input_data: str):
         
     except Exception as e:
         return f"Error updating technical skills: {e}. Input was: {repr(input_data)}"
+    
+@tool("Change Experience Details", return_direct=True)
+def tool_change_experience_details(experience_input: str):
+    """
+    Update the experience details(work experience) in the resume.
+    Use this tool when the user asks to update or change the work experience in their resume.
+    Input format: company|bullet_point_1|bullet_point_2|bullet_point_3
+    Example: Weekday|Enhanced platform functionality by delivering multiple end-to-end features|Reduced average time to hire candidates by 2 weeks|Boosted candidate engagement and response rates by 25%
+    """
+    print(f"Received experience_input: {repr(experience_input)}")
+    print(f"Input type: {type(experience_input)}")
+    
+    try:
+        if not experience_input or "|" not in experience_input:
+            return "Invalid input format. Use: company|bullet_point_1|bullet_point_2|..."
+        
+        parts = experience_input.split("|")
+        if len(parts) < 2:
+            return "Invalid input format. Use: company|bullet_point_1|bullet_point_2|..."
+        
+        company = parts[0].strip()
+        description_points = [point.strip() for point in parts[1:] if point.strip()]
+        
+        if not company:
+            return "Company name is required"
+        
+        if not description_points:
+            return "At least one description point is required"
+        
+        print(f"Company: {company}")
+        print(f"Description points: {description_points}")
+        
+        change_experience_details(company, description_points)
+        return f"Experience details updated for {company} with {len(description_points)} bullet points"
+        
+    except Exception as e:
+        return f"Error updating experience details: {e}. Input was: {repr(experience_input)}"
 
 @tool("Change Email", return_direct=True)
 def tool_change_email(email: str):
@@ -162,6 +199,7 @@ Always follow the exact format specified in each tool's description."""
           tool_chat,
           tool_get_updated_resume,
           tool_change_technical_skills,
+          tool_change_experience_details
           ],
         llm,
         agent="chat-zero-shot-react-description",
