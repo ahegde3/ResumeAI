@@ -13,7 +13,37 @@ import subprocess
 import tempfile
 from app.utils.file import extract_file_content
 
+def escape_latex_special_chars(text: str) -> str:
+    """
+    Escape special characters in text for LaTeX formatting.
+    Replaces special characters with their escaped versions using backslashes.
+    """
+    # Dictionary of LaTeX special characters and their escaped versions
+    latex_special_chars = {
+        '&': r'\&',
+        '%': r'\%',
+        '$': r'\$',
+        '#': r'\#',
+        '^': r'\^{}',
+        '_': r'\_',
+        '{': r'\{',
+        '}': r'\}',
+    }
+    
+    # Replace each special character with its escaped version
+    for char, escaped in latex_special_chars.items():
+        text = text.replace(char, escaped)
+    
+    return text
 
+def change_technical_skills(category: str, items: list[str]):
+    # Escape LaTeX special characters in each item
+    escaped_items = [escape_latex_special_chars(item) for item in items]
+    for skill in resume_info.technicalSkills:
+
+        if skill.category.lower() == category.lower():
+            skill.items = escaped_items
+            break
 
 def change_email( new_email):
     resume_info.email = new_email

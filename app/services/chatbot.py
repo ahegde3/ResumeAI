@@ -9,7 +9,7 @@ from app.services.prompt import get_system_prompt
 from app.utils.file import get_latest_uploaded_file_content
 
 
-from app.services.resume_editor import change_email, change_name, change_location, extract_resume_info, resume_to_latex ,latex_to_pdf,get_resume_info
+from app.services.resume_editor import change_email, change_name, change_location, change_technical_skills, resume_to_latex ,latex_to_pdf,get_resume_info
 from app.utils.file import extract_file_content
 
 load_dotenv()
@@ -21,6 +21,42 @@ llm_chat = LLMHandler().model
 
 def parse_args(args: str) -> list[str]:
     return [a.strip() for a in args.split(",")]
+
+@tool("Change Technical Skills", return_direct=True)
+def tool_change_technical_skills(input_data: str):
+    """
+    Updates technical skills in the resume. 
+    Input format: category_name|skill1,skill2,skill3
+    Example: Programming Languages|Python,JavaScript,Java
+    """
+    print(f"Received input_data: {repr(input_data)}")
+    print(f"Input type: {type(input_data)}")
+    
+    try:
+        # Parse the pipe-separated format
+        if "|" not in input_data:
+            return f"Invalid format. Use: category|skill1,skill2,skill3. Got: {input_data}"
+        
+        parts = input_data.split("|", 1)
+        if len(parts) != 2:
+            return f"Invalid format. Use: category|skill1,skill2,skill3. Got: {input_data}"
+        
+        category = parts[0].strip()
+        skills_str = parts[1].strip()
+        
+        # Parse skills
+        items = [skill.strip() for skill in skills_str.split(",") if skill.strip()]
+        
+        if not category or not items:
+            return f"Invalid input: Missing category or skills. Category: '{category}', Skills: {items}"
+            
+        print(f"Changing skills - Category: {category}, Items: {items}")
+        
+        change_technical_skills(category, items)
+        return f"Technical skills updated successfully. Category: {category}, Items: {items}"
+        
+    except Exception as e:
+        return f"Error updating technical skills: {e}. Input was: {repr(input_data)}"
 
 @tool("Change Email", return_direct=True)
 def tool_change_email(email: str):
@@ -108,13 +144,33 @@ def get_agent():
     # llm = ChatOpenAI(model="gpt-3.5-turbo")  # Or your preferred model
     llm = LLMHandler().model
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+    
+    # Custom system message for the agent
+    system_message = """You are a helpful resume editing assistant. 
+
+IMPORTANT TOOL USAGE INSTRUCTIONS:
+- When using the "Change Technical Skills" tool, use the format: category|skill1,skill2,skill3
+- Example: "Programming Languages|Python,JavaScript,Java"
+- Do NOT use JSON format, use the pipe-separated format shown above
+
+Always follow the exact format specified in each tool's description."""
+    
     agent = initialize_agent(
-        [tool_change_email, tool_change_name, tool_change_location, tool_chat, tool_get_updated_resume],
+        [tool_change_email,
+          tool_change_name,
+          tool_change_location,
+          tool_chat,
+          tool_get_updated_resume,
+          tool_change_technical_skills,
+          ],
         llm,
         agent="chat-zero-shot-react-description",
         verbose=True,
         handle_parsing_errors=True,
-        memory=memory
+        memory=memory,
+        agent_kwargs={
+            "system_message": system_message
+        }
     )
     return agent
 
