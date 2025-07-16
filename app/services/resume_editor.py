@@ -14,19 +14,66 @@ import tempfile
 from app.utils.file import extract_file_content
 
 
+def escape_latex_special_chars(text: str) -> str:
+    """
+    Escape special characters in text for LaTeX formatting.
+    Replaces special characters with their escaped versions using backslashes.
+    """
+    # Dictionary of LaTeX special characters and their escaped versions
+    latex_special_chars = {
+        '&': r'\&',
+        '%': r'\%',
+        '$': r'\$',
+        '#': r'\#',
+        '^': r'\^{}',
+        '_': r'\_',
+        '{': r'\{',
+        '}': r'\}',
+    }
+    
+    # Replace each special character with its escaped version
+    for char, escaped in latex_special_chars.items():
+        text = text.replace(char, escaped)
+    
+    return text
+
+def change_technical_skills(category: str, items: list[str]):
+    # Escape LaTeX special characters in each item
+    escaped_items = [escape_latex_special_chars(item) for item in items]
+    category_lower = category.lower()
+    for skill in resume_info.technicalSkills:
+        skill_category_lower = skill.category.lower()
+        if (skill_category_lower == category_lower or 
+            skill_category_lower in category_lower or 
+            category_lower in skill_category_lower):
+            skill.items = escaped_items
+            break
+        
+def change_experience_details(company: str, description: list[str]):
+
+    escaped_description = [escape_latex_special_chars(item) for item in description]
+
+    for experience in resume_info.experience:
+        company_lower = company.lower()
+        experience_company_lower = experience.company.lower()
+        # Check for exact match or partial match in either direction
+        if (company_lower == experience_company_lower or 
+            company_lower in experience_company_lower or 
+            experience_company_lower in company_lower):
+            experience.description = escaped_description
+            break
+
 
 def change_email( new_email):
     resume_info.email = new_email
-    print(resume_info)
-    # return re.sub(r'\\email\{[^\}]*\}', f'\\email{{{new_email}}}', latex)
+
 
 def change_name(new_name):
     resume_info.name = new_name
-    # return re.sub(r'\\name\{[^\}]*\}', f'\\name{{{new_name}}}', latex)
 
 def change_location(new_location):
     resume_info.location = new_location
-    # return re.sub(r'\\location\{[^\}]*\}', f'\\location{{{new_location}}}', latex)
+
 
 
 RESUME = {
