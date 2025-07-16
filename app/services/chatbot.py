@@ -57,6 +57,63 @@ def tool_change_technical_skills(input_data: str):
         
     except Exception as e:
         return f"Error updating technical skills: {e}. Input was: {repr(input_data)}"
+
+@tool("Update All Technical Skills", return_direct=True)
+def tool_update_all_technical_skills(skills_data: str):
+    """
+    Updates multiple technical skill categories at once in the resume.
+    Input format: category1|skill1,skill2;category2|skill3,skill4;category3|skill5,skill6
+    Example: Programming Languages|Python,JavaScript;Frontend|React,NextJs;Backend|NodeJs,Express
+    """
+    print(f"Received skills_data: {repr(skills_data)}")
+    
+    try:
+        if not skills_data or ";" not in skills_data:
+            return "Invalid format. Use: category1|skill1,skill2;category2|skill3,skill4"
+        
+        updated_categories = []
+        errors = []
+        
+        # Split by semicolon to get each category
+        categories = skills_data.split(";")
+        
+        for category_data in categories:
+            category_data = category_data.strip()
+            if not category_data:
+                continue
+                
+            if "|" not in category_data:
+                errors.append(f"Missing pipe separator in: {category_data}")
+                continue
+            
+            parts = category_data.split("|", 1)
+            if len(parts) != 2:
+                errors.append(f"Invalid format in: {category_data}")
+                continue
+            
+            category = parts[0].strip()
+            skills_str = parts[1].strip()
+            
+            # Parse skills
+            items = [skill.strip() for skill in skills_str.split(",") if skill.strip()]
+            
+            if not category or not items:
+                errors.append(f"Missing category or skills in: {category_data}")
+                continue
+            
+            try:
+                change_technical_skills(category, items)
+                updated_categories.append(f"{category} ({len(items)} skills)")
+            except Exception as e:
+                errors.append(f"Error updating {category}: {e}")
+        
+        if errors:
+            return f"Partially updated. Success: {updated_categories}. Errors: {errors}"
+        else:
+            return f"All technical skills updated successfully: {updated_categories}"
+            
+    except Exception as e:
+        return f"Error updating technical skills: {e}. Input was: {repr(skills_data)}"
     
 @tool("Change Experience Details", return_direct=True)
 def tool_change_experience_details(experience_input: str):
@@ -182,6 +239,8 @@ def get_agent():
 IMPORTANT TOOL USAGE INSTRUCTIONS:
 - When using the "Change Technical Skills" tool, use the format: category|skill1,skill2,skill3
 - Example: "Programming Languages|Python,JavaScript,Java"
+- When using the "Update All Technical Skills" tool for multiple categories, use the format: category1|skill1,skill2;category2|skill3,skill4;category3|skill5,skill6
+- Example: "Programming Languages|Python,JavaScript;Frontend|React,NextJs;Backend|NodeJs,Express"
 - Do NOT use JSON format, use the pipe-separated format shown above
 
 Always follow the exact format specified in each tool's description."""
@@ -193,6 +252,7 @@ Always follow the exact format specified in each tool's description."""
           tool_chat,
           tool_get_updated_resume,
           tool_change_technical_skills,
+          tool_update_all_technical_skills,
           tool_change_experience_details
           ],
         llm,

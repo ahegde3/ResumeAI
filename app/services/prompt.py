@@ -14,28 +14,20 @@ SYSTEM_PROMPTS = {
 
         Please perform the following tasks:
 
-        ### 1. Strategic Resume & JD Alignment
-        - Identify keyword and skill mismatches between resume and job description
-        - Highlight any gaps in experience vs. role requirements
-        - Suggest high-impact rewrites or additions based on XYZ methodology (X-result,Y-metric,Z-action)
-
-        ### 2. ATS Optimization
+        ### 1. ATS Optimization
         - Score the current resume's ATS compatibility (0–100 scale)
         - Generate a keyword optimization table mapping job requirements to resume content
         - Rebuild key sections with enhanced keyword density and proper formatting
 
-        ### 3. Psychological Framing & Narrative Positioning
-        - Identify ways to build a stronger narrative that creates inevitability for the role
-        - Suggest content hierarchy shifts to prioritize decision triggers (e.g., leadership, impact, domain expertise)
+        ### 2. Strategic Resume & JD Alignment
+        - Identify keyword and skill mismatches between resume and job description
+        - Highlight any gaps in experience vs. role requirements
+        - Suggest high-impact rewrites or additions based on XYZ methodology (X-result,Y-metric,Z-action)
 
-        ### 4. Deliverables
-        - Provide a fully optimized resume in plain text, formatted for ATS systems
 
-        ---
-        **TOOL USAGE INSTRUCTION:**
-        When calling the "Change Technical Skills" tool, use the format: category|skill1,skill2,skill3
-        Example: "Programming Languages|Python,JavaScript,Java"
-        ---
+        ### 3. Deliverables
+        - Provide a fully optimized resume using the above analysis(ATS Optimization, Strategic Resume & JD Alignment) in plain text,
+          formatted for ATS systems
         """
 }
 

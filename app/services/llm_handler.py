@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     
     # Default parameter settings
     max_tokens_default: int = int(os.getenv("MAX_TOKENS_DEFAULT", "1000"))
-    temperature_default: float = float(os.getenv("TEMPERATURE_DEFAULT", "0.7"))
+    temperature_default: float = float(os.getenv("TEMPERATURE_DEFAULT", "0.3"))
     
     # System prompt settings
     default_prompt_type: str = os.getenv("DEFAULT_PROMPT_TYPE", "default")
