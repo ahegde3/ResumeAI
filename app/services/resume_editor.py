@@ -40,9 +40,12 @@ def escape_latex_special_chars(text: str) -> str:
 def change_technical_skills(category: str, items: list[str]):
     # Escape LaTeX special characters in each item
     escaped_items = [escape_latex_special_chars(item) for item in items]
+    category_lower = category.lower()
     for skill in resume_info.technicalSkills:
-
-        if skill.category.lower() == category.lower():
+        skill_category_lower = skill.category.lower()
+        if (skill_category_lower == category_lower or 
+            skill_category_lower in category_lower or 
+            category_lower in skill_category_lower):
             skill.items = escaped_items
             break
         
