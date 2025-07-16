@@ -29,7 +29,14 @@ SYSTEM_PROMPTS = {
         - Suggest content hierarchy shifts to prioritize decision triggers (e.g., leadership, impact, domain expertise)
 
         ### 4. Deliverables
-        - Provide a fully optimized resume in plain text, formatted for ATS systems"""
+        - Provide a fully optimized resume in plain text, formatted for ATS systems
+
+        ---
+        **TOOL USAGE INSTRUCTION:**
+        When calling the "Change Technical Skills" tool, use the format: category|skill1,skill2,skill3
+        Example: "Programming Languages|Python,JavaScript,Java"
+        ---
+        """
 }
 
 def get_system_prompt(prompt_type="default"):

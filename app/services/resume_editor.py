@@ -13,6 +13,7 @@ import subprocess
 import tempfile
 from app.utils.file import extract_file_content
 
+
 def escape_latex_special_chars(text: str) -> str:
     """
     Escape special characters in text for LaTeX formatting.
@@ -46,25 +47,30 @@ def change_technical_skills(category: str, items: list[str]):
             break
         
 def change_experience_details(company: str, description: list[str]):
-    print("company", company)
-    print("description", description)
+
+    escaped_description = [escape_latex_special_chars(item) for item in description]
+
     for experience in resume_info.experience:
-        if experience.company.lower() == company.lower():
-            experience.description = description
+        company_lower = company.lower()
+        experience_company_lower = experience.company.lower()
+        # Check for exact match or partial match in either direction
+        if (company_lower == experience_company_lower or 
+            company_lower in experience_company_lower or 
+            experience_company_lower in company_lower):
+            experience.description = escaped_description
             break
+
 
 def change_email( new_email):
     resume_info.email = new_email
-    print(resume_info)
-    # return re.sub(r'\\email\{[^\}]*\}', f'\\email{{{new_email}}}', latex)
+
 
 def change_name(new_name):
     resume_info.name = new_name
-    # return re.sub(r'\\name\{[^\}]*\}', f'\\name{{{new_name}}}', latex)
 
 def change_location(new_location):
     resume_info.location = new_location
-    # return re.sub(r'\\location\{[^\}]*\}', f'\\location{{{new_location}}}', latex)
+
 
 
 RESUME = {

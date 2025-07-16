@@ -85,10 +85,7 @@ def tool_change_experience_details(experience_input: str):
         
         if not description_points:
             return "At least one description point is required"
-        
-        print(f"Company: {company}")
-        print(f"Description points: {description_points}")
-        
+                
         change_experience_details(company, description_points)
         return f"Experience details updated for {company} with {len(description_points)} bullet points"
         
