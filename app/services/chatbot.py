@@ -15,8 +15,6 @@ from app.utils.file import extract_file_content
 load_dotenv()
 
 
-
-
 llm_chat = LLMHandler().model
 
 def parse_args(args: str) -> list[str]:
@@ -192,7 +190,123 @@ def tool_get_updated_resume(message: str):
     latex_to_pdf(latex, "app/uploads/resume.pdf")
     return "DOne"
 
+@tool("Analyze Job Description", return_direct=True)
+def tool_analyze_job_description(job_description: str):
+    """
+    Analyzes a job description and provides recommendations for resume improvements.
+    Input should be the complete job description text.
+    This tool will analyze the job requirements and suggest specific changes to make the resume more aligned.
+    """
+    print(f"Analyzing job description: {job_description[:100]}...")
+    
+    try:
+        # Get current resume info
+        resume_content = get_resume_info()
+        if not resume_content:
+            return "No resume found. Please upload a resume first before analyzing job descriptions."
+        
+        # Create analysis prompt
+        analysis_prompt = f"""
+        Analyze this job description and current resume to provide specific recommendations:
+        
+        JOB DESCRIPTION:
+        {job_description}
+        
+        CURRENT RESUME:
+        {json.dumps(resume_content.dict(), indent=2)}
+        
+        Please provide:
+        1. Key skills mentioned in job description that are missing from resume
+        2. Technical skills to add or emphasize
+        3. Experience descriptions that could be improved to match job requirements
+        4. Specific action items for resume improvement
+        
+        Format your response as actionable recommendations.
+        """
+        
+        response = llm_chat.invoke([("system", "You are a resume optimization expert."), ("user", analysis_prompt)])
+        
+        if hasattr(response, "content"):
+            return f"JOB DESCRIPTION ANALYSIS:\n\n{response.content}"
+        return f"JOB DESCRIPTION ANALYSIS:\n\n{str(response)}"
+        
+    except Exception as e:
+        return f"Error analyzing job description: {e}"
 
+@tool("Auto-Optimize Resume for Job", return_direct=True)
+def tool_auto_optimize_resume(job_description: str):
+    """
+    Automatically optimizes the resume based on job description analysis.
+    This tool analyzes the job description and makes intelligent changes to technical skills and experience descriptions.
+    Input should be the complete job description text.
+    """
+    print(f"Auto-optimizing resume for job: {job_description[:100]}...")
+    
+    try:
+        # Get current resume info
+        resume_content = get_resume_info()
+        if not resume_content:
+            return "No resume found. Please upload a resume first."
+        
+        # Create optimization prompt
+        optimization_prompt = f"""
+        Based on this job description, suggest specific technical skills to add/update and experience improvements:
+        
+        JOB DESCRIPTION:
+        {job_description}
+        
+        CURRENT RESUME:
+        {json.dumps(resume_content.dict(), indent=2)}
+        
+        Please provide ONLY actionable changes in this format:
+        
+        TECHNICAL_SKILLS:
+        Category1|skill1,skill2,skill3
+        Category2|skill4,skill5,skill6
+        
+        EXPERIENCE_UPDATE:
+        CompanyName|bullet_point_1|bullet_point_2|bullet_point_3
+        
+        Only suggest changes that would genuinely improve the match with the job requirements.
+        If no changes are needed for a section, omit that section.
+        """
+        
+        response = llm_chat.invoke([("system", "You are a resume optimization expert. Provide only specific, actionable changes."), ("user", optimization_prompt)])
+        
+        content = response.content if hasattr(response, "content") else str(response)
+        
+        # Parse and apply changes
+        changes_made = []
+        
+        if "TECHNICAL_SKILLS:" in content:
+            skills_section = content.split("TECHNICAL_SKILLS:")[1].split("EXPERIENCE_UPDATE:")[0].strip()
+            skill_lines = [line.strip() for line in skills_section.split("\n") if line.strip() and "|" in line]
+            
+            for skill_line in skill_lines:
+                try:
+                    result = tool_change_technical_skills(skill_line)
+                    changes_made.append(f"Skills: {result}")
+                except Exception as e:
+                    changes_made.append(f"Skills error: {e}")
+        
+        if "EXPERIENCE_UPDATE:" in content:
+            exp_section = content.split("EXPERIENCE_UPDATE:")[1].strip()
+            exp_lines = [line.strip() for line in exp_section.split("\n") if line.strip() and "|" in line]
+            
+            for exp_line in exp_lines:
+                try:
+                    result = tool_change_experience_details(exp_line)
+                    changes_made.append(f"Experience: {result}")
+                except Exception as e:
+                    changes_made.append(f"Experience error: {e}")
+        
+        if changes_made:
+            return f"RESUME AUTO-OPTIMIZATION COMPLETE:\n\n" + "\n".join(changes_made) + f"\n\nANALYSIS:\n{content}"
+        else:
+            return f"ANALYSIS COMPLETE - No automatic changes needed:\n\n{content}"
+            
+    except Exception as e:
+        return f"Error auto-optimizing resume: {e}"
 
 
 def chat_with_bot(message: str):
@@ -234,14 +348,21 @@ def get_agent():
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
     
     # Custom system message for the agent
-    system_message = """You are a helpful resume editing assistant. 
+    system_message = """You are a helpful resume editing assistant with job description analysis capabilities.
 
 IMPORTANT TOOL USAGE INSTRUCTIONS:
 - When using the "Change Technical Skills" tool, use the format: category|skill1,skill2,skill3
 - Example: "Programming Languages|Python,JavaScript,Java"
 - When using the "Update All Technical Skills" tool for multiple categories, use the format: category1|skill1,skill2;category2|skill3,skill4;category3|skill5,skill6
 - Example: "Programming Languages|Python,JavaScript;Frontend|React,NextJs;Backend|NodeJs,Express"
+- For job description analysis, use "Analyze Job Description" tool to get recommendations
+- For automatic optimization, use "Auto-Optimize Resume for Job" tool to make intelligent changes
 - Do NOT use JSON format, use the pipe-separated format shown above
+
+JOB DESCRIPTION WORKFLOW:
+1. Use "Analyze Job Description" for analysis and recommendations
+2. Use "Auto-Optimize Resume for Job" for automatic changes
+3. Use individual tools for manual fine-tuning
 
 Always follow the exact format specified in each tool's description."""
     
@@ -253,7 +374,9 @@ Always follow the exact format specified in each tool's description."""
           tool_get_updated_resume,
           tool_change_technical_skills,
           tool_update_all_technical_skills,
-          tool_change_experience_details
+          tool_change_experience_details,
+          tool_analyze_job_description,
+          tool_auto_optimize_resume
           ],
         llm,
         agent="chat-zero-shot-react-description",
