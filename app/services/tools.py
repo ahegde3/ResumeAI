@@ -397,11 +397,13 @@ def tool_auto_optimize_resume(analysis_response: str):
                             except Exception as e:
                                 changes_made.append(f"Experience error: {e}")
                 
-                if changes_made:
-                    source = "conversation history" if use_history else "provided analysis"
-                    return f"RESUME AUTO-OPTIMIZATION COMPLETE (using {source}):\n\n" + "\n".join(changes_made) + f"\n\nOPTIMIZATION SUGGESTIONS:\n{content}"
-                else:
-                    return f"ANALYSIS COMPLETE - No automatic changes suggested in JSON response:\n\n{content}"
+                # Generate LaTeX and PDF
+                latex = resume_to_latex()
+                latex_to_pdf(latex, "app/uploads/resume.pdf")
+                print("Resume pdf generated")
+                
+                return f"RESUME AUTO-OPTIMIZATION COMPLETE:\n\n OPTIMIZATION SUGGESTIONS:\n{content}"
+
             
             else:
                 return f"Could not extract valid JSON from response. Raw response:\n\n{content}"

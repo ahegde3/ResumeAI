@@ -42,8 +42,7 @@ def change_technical_skills(category: str, items: list[str]):
     escaped_items = [escape_latex_special_chars(item) for item in items]
     escaped_category = escape_latex_special_chars(category)
     category_lower = category.lower()
-    print("Escaped items: ", escaped_items)
-    print("Escaped category: ", escaped_category)
+
     for skill in resume_info.technicalSkills:
         skill_category_lower = skill.category.lower()
         if (skill_category_lower == category_lower or 
@@ -62,7 +61,6 @@ def change_technical_skills(category: str, items: list[str]):
 def change_experience_details(company: str, description: list[str]):
 
     escaped_description = [escape_latex_special_chars(item) for item in description]
-    print("Escaped description: ", escaped_description)
     for experience in resume_info.experience:
         company_lower = company.lower()
         experience_company_lower = experience.company.lower()
