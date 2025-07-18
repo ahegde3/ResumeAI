@@ -39,7 +39,7 @@ async def chat_endpoint(request: Request):
     response = agent.run({"input": user_message})
     if response == "CHAT":
         response = chat_with_bot(user_message)
-    print(response)
+
     return {"response": response}
 
 

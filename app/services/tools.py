@@ -271,13 +271,31 @@ def tool_auto_optimize_resume(analysis_response: str):
             {json.dumps(resume_content.dict(), indent=2)}
             
             Please provide ONLY actionable changes in this format:
+
+                         Please provide response in JSON format similar to the resume :
+
+             Example:
+
+             {{
+                 "TechnicalSkills": [
+                     {{
+                         "category": "Programming Languages",
+                         "items": ["Python", "JavaScript/TypeScript", "Java", "Go", "C/C++"]
+                     }}
+                 ],
+                 "Experience": [
+                     {{
+                         "company": "Company Name",
+                         "position": "Position",
+                         "location": "Location",
+                         "startDate": "Start Date",
+                         "endDate": "End Date",
+                         "description": ["Bullet Point 1", "Bullet Point 2", "Bullet Point 3"]
+                     }}
+                 ]
+             }}
             
-            TECHNICAL_SKILLS:
-            Category1|skill1,skill2,skill3
-            Category2|skill4,skill5,skill6
-            
-            EXPERIENCE_UPDATE:
-            CompanyName|bullet_point_1|bullet_point_2|bullet_point_3
+
             
             Only suggest changes that would genuinely improve the match with the job requirements from our previous analysis.
             If no changes are needed for a section, omit that section.
@@ -303,14 +321,28 @@ def tool_auto_optimize_resume(analysis_response: str):
             CURRENT RESUME:
             {json.dumps(resume_content.dict(), indent=2)}
             
-            Please provide ONLY actionable changes in this format:
-            
-            TECHNICAL_SKILLS:
-            Category1|skill1,skill2,skill3
-            Category2|skill4,skill5,skill6
-            
-            EXPERIENCE_UPDATE:
-            CompanyName|bullet_point_1|bullet_point_2|bullet_point_3
+                         Please provide response in JSON format similar to the resume :
+
+             Example:
+
+             {{
+                 "TechnicalSkills": [
+                     {{
+                         "category": "Programming Languages",
+                         "items": ["Python", "JavaScript/TypeScript", "Java", "Go", "C/C++"]
+                     }}
+                 ],
+                 "Experience": [
+                     {{
+                         "company": "Company Name",
+                         "position": "Position",
+                         "location": "Location",
+                         "startDate": "Start Date",
+                         "endDate": "End Date",
+                         "description": ["Bullet Point 1", "Bullet Point 2", "Bullet Point 3"]
+                     }}
+                 ]
+             }}
             
             Only suggest changes that would genuinely improve the match with the job requirements.
             If no changes are needed for a section, omit that section.
@@ -323,36 +355,62 @@ def tool_auto_optimize_resume(analysis_response: str):
             
             content = response.content if hasattr(response, "content") else str(response)
         
-        # Parse and apply changes
+        # Parse and apply changes from JSON response
         changes_made = []
         
-        if "TECHNICAL_SKILLS:" in content:
-            skills_section = content.split("TECHNICAL_SKILLS:")[1].split("EXPERIENCE_UPDATE:")[0].strip()
-            skill_lines = [line.strip() for line in skills_section.split("\n") if line.strip() and "|" in line]
+        try:
+            # Try to extract JSON from the response
+            json_start = content.find('{')
+            json_end = content.rfind('}') + 1
             
-            for skill_line in skill_lines:
-                try:
-                    result = tool_change_technical_skills(skill_line)
-                    changes_made.append(f"Skills: {result}")
-                except Exception as e:
-                    changes_made.append(f"Skills error: {e}")
-        
-        if "EXPERIENCE_UPDATE:" in content:
-            exp_section = content.split("EXPERIENCE_UPDATE:")[1].strip()
-            exp_lines = [line.strip() for line in exp_section.split("\n") if line.strip() and "|" in line]
+            if json_start != -1 and json_end > json_start:
+                json_content = content[json_start:json_end]
+                parsed_data = json.loads(json_content)
+                
+                # Handle Technical Skills
+                if "TechnicalSkills" in parsed_data:
+                    for skill_category in parsed_data["TechnicalSkills"]:
+                        if "category" in skill_category and "items" in skill_category:
+                            category = skill_category["category"]
+                            items = skill_category["items"]
+                            
+                            # Convert to pipe format for existing function
+                            skill_line = f"{category}|{','.join(items)}"
+                            try:
+                                
+                                result = tool_change_technical_skills(skill_line)
+                                changes_made.append(f"Skills: {result}")
+                            except Exception as e:
+                                changes_made.append(f"Skills error: {e}")
+                
+                # Handle Experience Updates
+                if "Experience" in parsed_data:
+                    for exp_item in parsed_data["Experience"]:
+                        if "company" in exp_item and "description" in exp_item:
+                            company = exp_item["company"]
+                            description_points = exp_item["description"]
+                            
+                            # Convert to pipe format for existing function
+                            exp_line = f"{company}|{'|'.join(description_points)}"
+                            try:
+                                result = tool_change_experience_details(exp_line)
+                                changes_made.append(f"Experience: {result}")
+                            except Exception as e:
+                                changes_made.append(f"Experience error: {e}")
+                
+                if changes_made:
+                    source = "conversation history" if use_history else "provided analysis"
+                    return f"RESUME AUTO-OPTIMIZATION COMPLETE (using {source}):\n\n" + "\n".join(changes_made) + f"\n\nOPTIMIZATION SUGGESTIONS:\n{content}"
+                else:
+                    return f"ANALYSIS COMPLETE - No automatic changes suggested in JSON response:\n\n{content}"
             
-            for exp_line in exp_lines:
-                try:
-                    result = tool_change_experience_details(exp_line)
-                    changes_made.append(f"Experience: {result}")
-                except Exception as e:
-                    changes_made.append(f"Experience error: {e}")
-        
-        if changes_made:
-            source = "conversation history" if use_history else "provided analysis"
-            return f"RESUME AUTO-OPTIMIZATION COMPLETE (using {source}):\n\n" + "\n".join(changes_made) + f"\n\nOPTIMIZATION SUGGESTIONS:\n{content}"
-        else:
-            return f"ANALYSIS COMPLETE - No automatic changes needed:\n\n{content}"
+            else:
+                return f"Could not extract valid JSON from response. Raw response:\n\n{content}"
+                
+        except json.JSONDecodeError as e:
+            return f"Error parsing JSON response: {e}. Raw response:\n\n{content}"
+        except Exception as e:
+            return f"Error processing optimization suggestions: {e}. Raw response:\n\n{content}"
             
     except Exception as e:
         return f"Error auto-optimizing resume: {e}"
