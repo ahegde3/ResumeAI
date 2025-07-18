@@ -366,10 +366,10 @@ def tool_auto_optimize_resume(analysis_response: str):
             if json_start != -1 and json_end > json_start:
                 json_content = content[json_start:json_end]
                 parsed_data = json.loads(json_content)
-                
+                print(f"Parsed data: {parsed_data}")
                 # Handle Technical Skills
-                if "TechnicalSkills" in parsed_data:
-                    for skill_category in parsed_data["TechnicalSkills"]:
+                if "technicalSkills" in parsed_data:
+                    for skill_category in parsed_data["technicalSkills"]:
                         if "category" in skill_category and "items" in skill_category:
                             category = skill_category["category"]
                             items = skill_category["items"]
@@ -377,15 +377,14 @@ def tool_auto_optimize_resume(analysis_response: str):
                             # Convert to pipe format for existing function
                             skill_line = f"{category}|{','.join(items)}"
                             try:
-                                
-                                result = tool_change_technical_skills(skill_line)
-                                changes_made.append(f"Skills: {result}")
+                                change_technical_skills(category, items)
+                                changes_made.append(f"Skills: {skill_line}")
                             except Exception as e:
                                 changes_made.append(f"Skills error: {e}")
                 
                 # Handle Experience Updates
-                if "Experience" in parsed_data:
-                    for exp_item in parsed_data["Experience"]:
+                if "experience" in parsed_data:
+                    for exp_item in parsed_data["experience"]:
                         if "company" in exp_item and "description" in exp_item:
                             company = exp_item["company"]
                             description_points = exp_item["description"]
@@ -393,8 +392,8 @@ def tool_auto_optimize_resume(analysis_response: str):
                             # Convert to pipe format for existing function
                             exp_line = f"{company}|{'|'.join(description_points)}"
                             try:
-                                result = tool_change_experience_details(exp_line)
-                                changes_made.append(f"Experience: {result}")
+                                change_experience_details(company, description_points)
+                                changes_made.append(f"Experience: {exp_line}")
                             except Exception as e:
                                 changes_made.append(f"Experience error: {e}")
                 
