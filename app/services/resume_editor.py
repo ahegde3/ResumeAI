@@ -2,7 +2,7 @@ import re
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from app.services.llm_handler import LLMHandler
-from app.models.resume import Resume
+from app.models.resume import Resume, TechnicalSkillEntry, ExperienceEntry
 from jinja2 import Environment, FileSystemLoader
 import os
 import tempfile
@@ -38,21 +38,29 @@ def escape_latex_special_chars(text: str) -> str:
     return text
 
 def change_technical_skills(category: str, items: list[str]):
-    # Escape LaTeX special characters in each item
+    # Escape LaTeX special characters in each item and category
     escaped_items = [escape_latex_special_chars(item) for item in items]
+    escaped_category = escape_latex_special_chars(category)
     category_lower = category.lower()
+
     for skill in resume_info.technicalSkills:
         skill_category_lower = skill.category.lower()
         if (skill_category_lower == category_lower or 
             skill_category_lower in category_lower or 
             category_lower in skill_category_lower):
+            skill.category = escaped_category
             skill.items = escaped_items
-            break
+            print(f"Changed technical skills for {category}")
+            return
+    resume_info.technicalSkills.append(TechnicalSkillEntry(
+        category=escaped_category,
+        items=escaped_items
+    ))
+    print(f"Added new technical skills for {category}")
         
 def change_experience_details(company: str, description: list[str]):
 
     escaped_description = [escape_latex_special_chars(item) for item in description]
-
     for experience in resume_info.experience:
         company_lower = company.lower()
         experience_company_lower = experience.company.lower()
@@ -61,7 +69,13 @@ def change_experience_details(company: str, description: list[str]):
             company_lower in experience_company_lower or 
             experience_company_lower in company_lower):
             experience.description = escaped_description
-            break
+            print(f"Changed experience details for {company}")
+            return
+    resume_info.experience.append(ExperienceEntry(
+        company=company,
+        description=escaped_description
+    ))
+    print(f"Added new experience details for {company}")
 
 
 def change_email( new_email):
