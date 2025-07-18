@@ -52,6 +52,8 @@ class LLMHandler:
         self.provider = provider or self.settings.default_llm_provider
         print(f"Using {self.provider} as LLM provider")
         self._initialize_model()
+        # Initialize conversation history
+        self.conversation_history = []
         # self._initialize_tokenizer()
     
     def _initialize_model(self):
@@ -80,6 +82,45 @@ class LLMHandler:
                 api_key=self.settings.openai_api_key
             )
     
+    def add_to_history(self, role: str, content: str):
+        """Add a message to conversation history."""
+        self.conversation_history.append((role, content))
+    
+    def clear_history(self):
+        """Clear conversation history."""
+        self.conversation_history = []
+    
+    def get_history(self):
+        """Get current conversation history."""
+        return self.conversation_history.copy()
+    
+    def invoke_with_history(self, system_message: str, user_message: str, add_to_history: bool = False):
+        """
+        Invoke the model with conversation history.
+        
+        Args:
+            system_message: System prompt for the LLM
+            user_message: User message to add
+            add_to_history: Whether to store this conversation in history
+        
+        Returns:
+            Response from the LLM
+        """
+        # Build the full conversation
+        messages = [("system", system_message)]
+        messages.extend(self.conversation_history)
+        messages.append(("user", user_message))
+        
+        # Invoke the model
+        response = self.model.invoke(messages)
+        
+        # Optionally add to history
+        if add_to_history:
+            self.add_to_history("user", user_message)
+            response_content = response.content if hasattr(response, "content") else str(response)
+            self.add_to_history("assistant", response_content)
+        
+        return response
 
 
 # Create a singleton instance
