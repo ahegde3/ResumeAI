@@ -313,6 +313,8 @@ def tool_auto_optimize_resume(analysis_response: str):
 
             
             Only suggest changes that would genuinely improve the match with the job requirements from our previous analysis.
+            DO NOT SUGGEST CHANGES TO THE RESUME THAT ARE NOT MENTIONED IN THE ANALYSIS RESPONSE.
+            DO NOT HIGHLIGHT ANY SPECIFIC KEYWORD in **KEYWORD** format.
             If no changes are needed for a section, omit that section.
             Use the insights from our previous analysis to make targeted recommendations.
             """
