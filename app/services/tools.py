@@ -5,12 +5,15 @@ LangChain tools for resume editing and analysis.
 import json
 from langchain.agents import tool
 from app.services.llm_handler import LLMHandler
-from app.services.resume_editor import (
+from app.services.resume import (
     change_email, change_name, change_location, change_technical_skills, 
-    resume_to_latex, latex_to_pdf, get_resume_info, change_experience_details
+    resume_to_latex, latex_to_pdf, get_default_resume_content, change_experience_details,
+    delete_technical_skill_category, delete_technical_skill_item
 )
+from app.services.prompt import get_system_prompt
 
 llm_handler = LLMHandler()
+
 
 @tool("Change Technical Skills", return_direct=True)
 def tool_change_technical_skills(input_data: str):
@@ -168,6 +171,18 @@ def tool_chat(message: str):
     Respond conversationally to the user.
     Use this tool for all general questions, greetings, or when the user is not asking to edit the resume.
     """
+    system_prompt = get_system_prompt("default")
+    input_message = [("system", system_prompt), ("user", message)]
+    print("Resume review LLM call invoked ")
+    response = llm_handler.model.invoke(input_message)
+    print("Resume review LLM call completed")
+    
+    # Extract content from response
+    if hasattr(response, "content"):
+        return response.content
+    if isinstance(response, dict) and "content" in response:
+        return response["content"]
+    return str(response)
     return "CHAT"
 
 @tool("Clear Analysis History", return_direct=True)
@@ -200,7 +215,7 @@ def tool_analyze_job_description(job_description: str):
     
     try:
         # Get current resume info
-        resume_content = get_resume_info()
+        resume_content = get_default_resume_content()
         if not resume_content:
             return "No resume found. Please upload a resume first before analyzing job descriptions."
         
@@ -250,7 +265,7 @@ def tool_auto_optimize_resume(analysis_response: str):
     
     try:
         # Get current resume info
-        resume_content = get_resume_info()
+        resume_content = get_default_resume_content()
         if not resume_content:
             return "No resume found. Please upload a resume first."
         
@@ -298,6 +313,8 @@ def tool_auto_optimize_resume(analysis_response: str):
 
             
             Only suggest changes that would genuinely improve the match with the job requirements from our previous analysis.
+            DO NOT SUGGEST CHANGES TO THE RESUME THAT ARE NOT MENTIONED IN THE ANALYSIS RESPONSE.
+            DO NOT HIGHLIGHT ANY SPECIFIC KEYWORD in **KEYWORD** format.
             If no changes are needed for a section, omit that section.
             Use the insights from our previous analysis to make targeted recommendations.
             """
@@ -417,6 +434,70 @@ def tool_auto_optimize_resume(analysis_response: str):
         return f"Error auto-optimizing resume: {e}"
 
 
+@tool("Delete Technical Skills", return_direct=True)
+def tool_delete_technical_skills(delete_input: str):
+    """
+    Delete technical skills from the resume.
+    Use this tool when the user asks to delete, remove, or take out skills from their resume.
+    
+    Input formats:
+    1. To delete entire category: "CATEGORY|category_name"
+       Example: "CATEGORY|Frontend"
+    
+    2. To delete specific skill from category: "ITEM|category_name|skill_name"
+       Example: "ITEM|Frontend|HTML"
+       Example: "ITEM|Programming Languages|Java"
+    """
+    print(f"Received delete_input: {repr(delete_input)}")
+    
+    try:
+        if not delete_input or "|" not in delete_input:
+            return "Invalid format. Use 'CATEGORY|category_name' to delete entire category or 'ITEM|category_name|skill_name' to delete specific skill."
+        
+        parts = delete_input.split("|")
+        
+        if len(parts) < 2:
+            return "Invalid format. Use 'CATEGORY|category_name' or 'ITEM|category_name|skill_name'"
+        
+        operation = parts[0].strip().upper()
+        
+        if operation == "CATEGORY":
+            if len(parts) != 2:
+                return "Invalid format for category deletion. Use: CATEGORY|category_name"
+            
+            category = parts[1].strip()
+            if not category:
+                return "Category name is required"
+            
+            success = delete_technical_skill_category(category)
+            if success:
+                return f"Successfully deleted entire '{category}' skill category from resume"
+            else:
+                return f"Category '{category}' not found in resume"
+        
+        elif operation == "ITEM":
+            if len(parts) != 3:
+                return "Invalid format for item deletion. Use: ITEM|category_name|skill_name"
+            
+            category = parts[1].strip()
+            item = parts[2].strip()
+            
+            if not category or not item:
+                return "Both category name and skill name are required"
+            
+            success = delete_technical_skill_item(category, item)
+            if success:
+                return f"Successfully deleted '{item}' from '{category}' category"
+            else:
+                return f"Either category '{category}' or skill '{item}' not found in resume"
+        
+        else:
+            return f"Invalid operation '{operation}'. Use 'CATEGORY' or 'ITEM'"
+            
+    except Exception as e:
+        return f"Error deleting technical skills: {e}. Input was: {repr(delete_input)}"
+
+
 # Export all tools for easy import
 ALL_TOOLS = [
     tool_change_email,
@@ -429,5 +510,6 @@ ALL_TOOLS = [
     tool_update_all_technical_skills,
     tool_change_experience_details,
     tool_analyze_job_description,
-    tool_auto_optimize_resume
+    tool_auto_optimize_resume,
+    tool_delete_technical_skills
 ] 

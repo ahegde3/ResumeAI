@@ -4,8 +4,8 @@ from fastapi import Request, File, Form, UploadFile
 from fastapi.responses import JSONResponse
 from typing import Optional
 from pathlib import Path
-from app.services.chatbot import chat_with_bot , get_agent
-from app.services.resume_editor import extract_resume_info
+from app.services.chatbot import   get_agent
+# from app.services.resume import extract_resume_info
 from app.utils.file import extract_file_content
 
 
@@ -37,8 +37,6 @@ async def chat_endpoint(request: Request):
         return JSONResponse({"error": "Empty message"}, status_code=400)
     # Send user message to agent and get response
     response = agent.run({"input": user_message})
-    if response == "CHAT":
-        response = chat_with_bot(user_message)
 
     return {"response": response}
 
@@ -79,9 +77,9 @@ async def upload_file(
         )
     
 
-@router.get("/resume_info")
-def resume_info():
-    resume_content = extract_file_content(os.path.join("app/uploads", "main.tex"))
+# @router.get("/resume_info")
+# def resume_info():
+#     resume_content = extract_file_content(os.path.join("app/uploads", "main.tex"))
 
-    resume_info = extract_resume_info(resume_content)
-    return resume_info
+#     resume_info = extract_resume_info(resume_content)
+#     return resume_info
