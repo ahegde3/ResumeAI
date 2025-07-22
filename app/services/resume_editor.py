@@ -37,21 +37,63 @@ def escape_latex_special_chars(text: str) -> str:
     
     return text
 
+
+def unescape_latex_special_chars(text: str) -> str:
+    """
+    Unescape LaTeX special characters back to normal text.
+    """
+    # Dictionary of escaped LaTeX characters and their unescaped versions
+    latex_escaped_chars = {
+        r'\&': '&',
+        r'\%': '%',
+        r'\$': '$',
+        r'\#': '#',
+        r'\^{}': '^',
+        r'\_': '_',
+        r'\{': '{',
+        r'\}': '}',
+    }
+    
+    # Replace each escaped character with its unescaped version
+    for escaped, char in latex_escaped_chars.items():
+        text = text.replace(escaped, char)
+    
+    return text
+
+
+def escape_resume_data(data):
+    """
+    Recursively escape LaTeX special characters in all string fields of the resume data.
+    Handles nested dictionaries, lists, and string values.
+    """
+    if isinstance(data, dict):
+        return {key: escape_resume_data(value) for key, value in data.items()}
+    elif isinstance(data, list):
+        return [escape_resume_data(item) for item in data]
+    elif isinstance(data, str):
+        return escape_latex_special_chars(data)
+    else:
+        # Return other types (int, float, bool, None) unchanged
+        return data
+
 def change_technical_skills(category: str, items: list[str]):
     # Escape LaTeX special characters in each item and category
     escaped_items = [escape_latex_special_chars(item) for item in items]
     escaped_category = escape_latex_special_chars(category)
-    category_lower = category.lower()
+    escaped_category_lower = escaped_category.lower()
 
     for skill in resume_info.technicalSkills:
+        # Compare escaped versions for accurate matching
         skill_category_lower = skill.category.lower()
-        if (skill_category_lower == category_lower or 
-            skill_category_lower in category_lower or 
-            category_lower in skill_category_lower):
+        if (skill_category_lower == escaped_category_lower or 
+            skill_category_lower in escaped_category_lower or 
+            escaped_category_lower in skill_category_lower):
             skill.category = escaped_category
             skill.items = escaped_items
             print(f"Changed technical skills for {category}")
             return
+    
+    # No match found, add new entry
     resume_info.technicalSkills.append(TechnicalSkillEntry(
         category=escaped_category,
         items=escaped_items
@@ -61,18 +103,21 @@ def change_technical_skills(category: str, items: list[str]):
 def change_experience_details(company: str, description: list[str]):
 
     escaped_description = [escape_latex_special_chars(item) for item in description]
+    escaped_company = escape_latex_special_chars(company)
+    escaped_company_lower = escaped_company.lower()
+    
     for experience in resume_info.experience:
-        company_lower = company.lower()
+        # Compare escaped versions for accurate matching
         experience_company_lower = experience.company.lower()
         # Check for exact match or partial match in either direction
-        if (company_lower == experience_company_lower or 
-            company_lower in experience_company_lower or 
-            experience_company_lower in company_lower):
+        if (escaped_company_lower == experience_company_lower or 
+            escaped_company_lower in experience_company_lower or 
+            experience_company_lower in escaped_company_lower):
             experience.description = escaped_description
             print(f"Changed experience details for {company}")
             return
     resume_info.experience.append(ExperienceEntry(
-        company=company,
+        company=escaped_company,
         description=escaped_description
     ))
     print(f"Added new experience details for {company}")
@@ -122,8 +167,8 @@ RESUME = {
       "startDate": "Jul 2024",
       "endDate": "Dec 2024",
       "description": [
-        "Enhanced researcher efficiency by 47\% by developing UI in React for complex data visualization and interaction.",
-        "Boosted application performance by 65\% (targeting a reduction in load time from 10s to 3.5s) by implementing Redis caching and asynchronous programming patterns.",
+        "Enhanced researcher efficiency by 47% by developing UI in React for complex data visualization and interaction.",
+        "Boosted application performance by 65% (targeting a reduction in load time from 10s to 3.5s) by implementing Redis caching and asynchronous programming patterns.",
         "Devised and implemented a robust data persistence strategy, integrating local storage with backend caching to ensure a fluid and uninterrupted user experience across multiple sessions."
       ]
     },
@@ -137,7 +182,7 @@ RESUME = {
       "description": [
         "Expanded backend API capabilities by developing and deploying over 15 new GraphQL resolvers and mutations within an AWS Lambda-based serverless microservice architecture.",
         "Strengthened application security and protected critical data by implementing GraphQL Shield rules, engineering custom authorization for sensitive mutations, and resolving Dataloader caching vulnerabilities.",
-        "Cut backend latency by 18\% for critical data endpoints by analyzing query execution plans to identify bottlenecks, rewriting inefficient SQL queries, and implementing strategic database indexes."
+        "Cut backend latency by 18% for critical data endpoints by analyzing query execution plans to identify bottlenecks, rewriting inefficient SQL queries, and implementing strategic database indexes."
       ]
     },
     {
@@ -149,8 +194,8 @@ RESUME = {
       "endDate": "Feb 2023",
       "description": [
         "Enhanced platform functionality by delivering multiple end-to-end features, which involved scoping requirements, developing REST APIs (Node.js, Express), and translating Figma mockups into functional React UI components.",
-        "Reduced average time to hire candidates by 2 weeks (28\%) by leading the development of a new candidate inbound sourcing strategy.",
-        "Boosted candidate engagement and response rates by 25\% by engineering a unified messaging system that consolidated communication over different channels into a single contextual view for recruiters."
+        "Reduced average time to hire candidates by 2 weeks (28%) by leading the development of a new candidate inbound sourcing strategy.",
+        "Boosted candidate engagement and response rates by 25% by engineering a unified messaging system that consolidated communication over different channels into a single contextual view for recruiters."
       ]
     },
     {
@@ -161,9 +206,9 @@ RESUME = {
       "startDate": "Sep 2020",
       "endDate": "May 2022",
       "description": [
-        "Achieved \$7,000 in monthly AWS EC2 and proxy cost savings by designing and implementing a high-volume NodeJS-based web crawling product (processing 300,000 URLs daily from 110+ retailers) and re-architecting Kafka message consumption from a push to a pull-based model for improved performance.",
-        "Resolved critical performance bottlenecks and stability issues, cutting CPU usage by 37\% and eliminating 100\% of message-related server crashes, by executing an architectural shift in Kafka consumption model.",
-        "Reduced analyst workflow effort by 34\% by conceptualizing and building an internal React-based Chrome Extension, streamlining data access and manipulation tasks."
+        "Achieved $7,000 in monthly AWS EC2 and proxy cost savings by designing and implementing a high-volume NodeJS-based web crawling product (processing 300,000 URLs daily from 110+ retailers) and re-architecting Kafka message consumption from a push to a pull-based model for improved performance.",
+        "Resolved critical performance bottlenecks and stability issues, cutting CPU usage by 37% and eliminating 100% of message-related server crashes, by executing an architectural shift in Kafka consumption model.",
+        "Reduced analyst workflow effort by 34% by conceptualizing and building an internal React-based Chrome Extension, streamlining data access and manipulation tasks."
       ]
     }
   ],
@@ -175,7 +220,7 @@ RESUME = {
           "tech": "NextJs, FastAPI, Cloud Run,Pub/Sub, LLM",
           "description": [
             "Engineered a scalable MLOps pipeline capable of processing videos of unlimited length, overcoming the previous 10-minute hard limit, by migrating the core workflow to an asynchronous, Pub/Sub-triggered architecture on GCP.",
-            "Improved student comprehension and retention rates by 30\% , engineering an innovative interactive chatbot service designed to enhance learner engagement with video lecture content."
+            "Improved student comprehension and retention rates by 30% , engineering an innovative interactive chatbot service designed to enhance learner engagement with video lecture content."
           ]
       }
   ],
@@ -193,7 +238,7 @@ RESUME = {
       "items": ["NodeJs", "Express", "FastAPI", "Flask", "Apache Kafka", "GraphQL", "REST", "gRPC"]
     },
     {
-      "category": "Cloud \& DevOps",
+      "category": "Cloud & DevOps",
       "items": ["GCP", "AWS", "Docker", "Kubernetes", "CI/CD", "Git"]
     },
     {
@@ -271,7 +316,10 @@ def extract_resume_info(resume: str = None):
     #         response = response[:response.rfind('```')].strip()
     # print(response)
     # resume = Resume.model_validate_json(response)
-    resume = Resume.model_validate(RESUME)
+    
+    # Escape LaTeX special characters in all string fields before model creation
+    escaped_resume_data = escape_resume_data(RESUME)
+    resume = Resume.model_validate(escaped_resume_data)
     return resume
 
 
