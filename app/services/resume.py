@@ -188,6 +188,65 @@ def change_location(new_location):
     resume_info.location = new_location
 
 
+def delete_technical_skill_category(category: str):
+    """
+    Delete an entire technical skill category from the resume.
+    """
+    escaped_category = escape_latex_special_chars(category)
+    escaped_category_lower = escaped_category.lower()
+    
+    # Find and remove the category
+    for i, skill in enumerate(resume_info.technicalSkills):
+        skill_category_lower = skill.category.lower()
+        if (skill_category_lower == escaped_category_lower or 
+            skill_category_lower in escaped_category_lower or 
+            escaped_category_lower in skill_category_lower):
+            removed_category = resume_info.technicalSkills.pop(i)
+            print(f"Deleted technical skill category: {removed_category.category}")
+            return True
+    
+    print(f"Category '{category}' not found")
+    return False
+
+
+def delete_technical_skill_item(category: str, item: str):
+    """
+    Delete a specific technical skill item from a category.
+    """
+    escaped_category = escape_latex_special_chars(category)
+    escaped_item = escape_latex_special_chars(item)
+    escaped_category_lower = escaped_category.lower()
+    escaped_item_lower = escaped_item.lower()
+    
+    # Find the category
+    for skill in resume_info.technicalSkills:
+        skill_category_lower = skill.category.lower()
+        if (skill_category_lower == escaped_category_lower or 
+            skill_category_lower in escaped_category_lower or 
+            escaped_category_lower in skill_category_lower):
+            
+            # Find and remove the item
+            for i, skill_item in enumerate(skill.items):
+                skill_item_lower = skill_item.lower()
+                if (skill_item_lower == escaped_item_lower or 
+                    skill_item_lower in escaped_item_lower or 
+                    escaped_item_lower in skill_item_lower):
+                    removed_item = skill.items.pop(i)
+                    print(f"Deleted '{removed_item}' from '{skill.category}' category")
+                    
+                    # If category becomes empty, remove it entirely
+                    if not skill.items:
+                        resume_info.technicalSkills.remove(skill)
+                        print(f"Category '{skill.category}' was empty and has been removed")
+                    
+                    return True
+            
+            print(f"Item '{item}' not found in category '{skill.category}'")
+            return False
+    
+    print(f"Category '{category}' not found")
+    return False
+
 
 def resume_to_latex() -> str:
     """
