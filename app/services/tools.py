@@ -5,12 +5,14 @@ LangChain tools for resume editing and analysis.
 import json
 from langchain.agents import tool
 from app.services.llm_handler import LLMHandler
-from app.services.resume_editor import (
+from app.services.resume import (
     change_email, change_name, change_location, change_technical_skills, 
-    resume_to_latex, latex_to_pdf, get_resume_info, change_experience_details
+    resume_to_latex, latex_to_pdf, get_default_resume_content, change_experience_details
 )
+from app.services.prompt import get_system_prompt
 
 llm_handler = LLMHandler()
+
 
 @tool("Change Technical Skills", return_direct=True)
 def tool_change_technical_skills(input_data: str):
@@ -168,6 +170,35 @@ def tool_chat(message: str):
     Respond conversationally to the user.
     Use this tool for all general questions, greetings, or when the user is not asking to edit the resume.
     """
+    resume_content = get_default_resume_content()
+    base_prompt = get_system_prompt()
+    if resume_content:
+        resume_json = json.dumps(resume_content.dict(), indent=2)
+        system_prompt = (
+            base_prompt
+            + "\n\n---\nUSER RESUME INFORMATION :\n"
+            + resume_json
+            + "\n---\n"
+            + "ALWAYS use the above USER RESUME INFORMATION when answering questions about the user's resume." 
+            + "NEVER say you don't have the resume. If the user asks about their resume, refer to the above content."
+        )
+    else:
+        system_prompt = (
+            base_prompt
+            + "\n\nNote: The user has not uploaded a resume yet. If asked about the resume, politely inform the user to upload one."
+        )
+
+    input_message = [("system", system_prompt), ("user", message)]
+    print("Resume review LLM call invoked ")
+    response = llm_handler.model.invoke(input_message)
+    print("Resume review LLM call completed")
+    
+    # Extract content from response
+    if hasattr(response, "content"):
+        return response.content
+    if isinstance(response, dict) and "content" in response:
+        return response["content"]
+    return str(response)
     return "CHAT"
 
 @tool("Clear Analysis History", return_direct=True)
@@ -200,7 +231,7 @@ def tool_analyze_job_description(job_description: str):
     
     try:
         # Get current resume info
-        resume_content = get_resume_info()
+        resume_content = get_default_resume_content()
         if not resume_content:
             return "No resume found. Please upload a resume first before analyzing job descriptions."
         
@@ -250,7 +281,7 @@ def tool_auto_optimize_resume(analysis_response: str):
     
     try:
         # Get current resume info
-        resume_content = get_resume_info()
+        resume_content = get_default_resume_content()
         if not resume_content:
             return "No resume found. Please upload a resume first."
         

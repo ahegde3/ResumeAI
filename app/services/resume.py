@@ -1,139 +1,10 @@
-import re
-from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
-from app.services.llm_handler import LLMHandler
+
 from app.models.resume import Resume, TechnicalSkillEntry, ExperienceEntry
 from jinja2 import Environment, FileSystemLoader
 import os
 import tempfile
 import subprocess
-import shutil
-import os
-import subprocess
-import tempfile
-from app.utils.file import extract_file_content
-
-
-def escape_latex_special_chars(text: str) -> str:
-    """
-    Escape special characters in text for LaTeX formatting.
-    Replaces special characters with their escaped versions using backslashes.
-    """
-    # Dictionary of LaTeX special characters and their escaped versions
-    latex_special_chars = {
-        '&': r'\&',
-        '%': r'\%',
-        '$': r'\$',
-        '#': r'\#',
-        '^': r'\^{}',
-        '_': r'\_',
-        '{': r'\{',
-        '}': r'\}',
-    }
-    
-    # Replace each special character with its escaped version
-    for char, escaped in latex_special_chars.items():
-        text = text.replace(char, escaped)
-    
-    return text
-
-
-def unescape_latex_special_chars(text: str) -> str:
-    """
-    Unescape LaTeX special characters back to normal text.
-    """
-    # Dictionary of escaped LaTeX characters and their unescaped versions
-    latex_escaped_chars = {
-        r'\&': '&',
-        r'\%': '%',
-        r'\$': '$',
-        r'\#': '#',
-        r'\^{}': '^',
-        r'\_': '_',
-        r'\{': '{',
-        r'\}': '}',
-    }
-    
-    # Replace each escaped character with its unescaped version
-    for escaped, char in latex_escaped_chars.items():
-        text = text.replace(escaped, char)
-    
-    return text
-
-
-def escape_resume_data(data):
-    """
-    Recursively escape LaTeX special characters in all string fields of the resume data.
-    Handles nested dictionaries, lists, and string values.
-    """
-    if isinstance(data, dict):
-        return {key: escape_resume_data(value) for key, value in data.items()}
-    elif isinstance(data, list):
-        return [escape_resume_data(item) for item in data]
-    elif isinstance(data, str):
-        return escape_latex_special_chars(data)
-    else:
-        # Return other types (int, float, bool, None) unchanged
-        return data
-
-def change_technical_skills(category: str, items: list[str]):
-    # Escape LaTeX special characters in each item and category
-    escaped_items = [escape_latex_special_chars(item) for item in items]
-    escaped_category = escape_latex_special_chars(category)
-    escaped_category_lower = escaped_category.lower()
-
-    for skill in resume_info.technicalSkills:
-        # Compare escaped versions for accurate matching
-        skill_category_lower = skill.category.lower()
-        if (skill_category_lower == escaped_category_lower or 
-            skill_category_lower in escaped_category_lower or 
-            escaped_category_lower in skill_category_lower):
-            skill.category = escaped_category
-            skill.items = escaped_items
-            print(f"Changed technical skills for {category}")
-            return
-    
-    # No match found, add new entry
-    resume_info.technicalSkills.append(TechnicalSkillEntry(
-        category=escaped_category,
-        items=escaped_items
-    ))
-    print(f"Added new technical skills for {category}")
-        
-def change_experience_details(company: str, description: list[str]):
-
-    escaped_description = [escape_latex_special_chars(item) for item in description]
-    escaped_company = escape_latex_special_chars(company)
-    escaped_company_lower = escaped_company.lower()
-    
-    for experience in resume_info.experience:
-        # Compare escaped versions for accurate matching
-        experience_company_lower = experience.company.lower()
-        # Check for exact match or partial match in either direction
-        if (escaped_company_lower == experience_company_lower or 
-            escaped_company_lower in experience_company_lower or 
-            experience_company_lower in escaped_company_lower):
-            experience.description = escaped_description
-            print(f"Changed experience details for {company}")
-            return
-    resume_info.experience.append(ExperienceEntry(
-        company=escaped_company,
-        description=escaped_description
-    ))
-    print(f"Added new experience details for {company}")
-
-
-def change_email( new_email):
-    resume_info.email = new_email
-
-
-def change_name(new_name):
-    resume_info.name = new_name
-
-def change_location(new_location):
-    resume_info.location = new_location
-
-
+from app.utils.util import escape_latex_special_chars, escape_data
 
 RESUME = {
   "name": "Anish Hegde",
@@ -248,79 +119,74 @@ RESUME = {
   ]
 }
 
-# Add more as needed
-
-EXTRACTION_PROMPT = """
-You are an information extraction assistant. Given a LaTeX resume, extract the following fields as accurately as possible:
-- Name
-- Location
-- Phone Number
-
-Return your answer in this JSON format:
-
-{{
-  "name": "",
-  "location": "",
-  "phone": "",
-  "email": "",
-  "linkedinUrl": "",
-  "githubUrl": "",
-
-  "education": [
-    {{
-      "degree": "",
-      "school": "",
-      "startDate": "",
-      "endDate": "",
-      "gpa": ""
-    }}
-  ],
-  "experience": [
-    {{
-      "company": "",
-      "position": "",
-      "location": "",
-      "title": "",
-      "startDate": "",
-      "endDate": "",
-      "description": ""
-    }}
-    ]
-}}
-
-Here is the LaTeX resume:
-----------------------
-{resume}
-----------------------
-"""
 
 
-llm_extractor = LLMHandler().model
-
-# Prepare prompt template
-template = EXTRACTION_PROMPT
-prompt = PromptTemplate.from_template(template)
-# Build the chain
-chain = LLMChain(llm=llm_extractor, prompt=prompt)
-
-
-def extract_resume_info(resume: str = None):
-    # response = chain.run(resume=resume)
-    # # Remove Markdown code block markers if present
-    # if response.strip().startswith('```'):
-    #     response = response.strip().lstrip('`').split('\n', 1)[-1]
-    #     if response.strip().startswith('json'):
-    #         response = response.strip()[4:]
-    #     response = response.strip()
-    #     if response.endswith('```'):
-    #         response = response[:response.rfind('```')].strip()
-    # print(response)
-    # resume = Resume.model_validate_json(response)
-    
-    # Escape LaTeX special characters in all string fields before model creation
-    escaped_resume_data = escape_resume_data(RESUME)
+def get_default_resume_content():
+    escaped_resume_data = escape_data(RESUME)
     resume = Resume.model_validate(escaped_resume_data)
     return resume
+
+
+resume_info = get_default_resume_content()
+
+
+def change_technical_skills(category: str, items: list[str]):
+    # Escape LaTeX special characters in each item and category
+    escaped_items = [escape_latex_special_chars(item) for item in items]
+    escaped_category = escape_latex_special_chars(category)
+    escaped_category_lower = escaped_category.lower()
+
+    for skill in resume_info.technicalSkills:
+        # Compare escaped versions for accurate matching
+        skill_category_lower = skill.category.lower()
+        if (skill_category_lower == escaped_category_lower or 
+            skill_category_lower in escaped_category_lower or 
+            escaped_category_lower in skill_category_lower):
+            skill.category = escaped_category
+            skill.items = escaped_items
+            print(f"Changed technical skills for {category}")
+            return
+    
+    # No match found, add new entry
+    resume_info.technicalSkills.append(TechnicalSkillEntry(
+        category=escaped_category,
+        items=escaped_items
+    ))
+    print(f"Added new technical skills for {category}")
+        
+def change_experience_details(company: str, description: list[str]):
+
+    escaped_description = [escape_latex_special_chars(item) for item in description]
+    escaped_company = escape_latex_special_chars(company)
+    escaped_company_lower = escaped_company.lower()
+    
+    for experience in resume_info.experience:
+        # Compare escaped versions for accurate matching
+        experience_company_lower = experience.company.lower()
+        # Check for exact match or partial match in either direction
+        if (escaped_company_lower == experience_company_lower or 
+            escaped_company_lower in experience_company_lower or 
+            experience_company_lower in escaped_company_lower):
+            experience.description = escaped_description
+            print(f"Changed experience details for {company}")
+            return
+    resume_info.experience.append(ExperienceEntry(
+        company=escaped_company,
+        description=escaped_description
+    ))
+    print(f"Added new experience details for {company}")
+
+
+def change_email( new_email):
+    resume_info.email = new_email
+
+
+def change_name(new_name):
+    resume_info.name = new_name
+
+def change_location(new_location):
+    resume_info.location = new_location
+
 
 
 def resume_to_latex() -> str:
@@ -337,7 +203,7 @@ def resume_to_latex() -> str:
         comment_end_string='}',
         autoescape=False
     )
-    print(resume_info)
+
     template = env.get_template('main.tex')
     return template.render(resume=resume_info)
 
@@ -348,32 +214,6 @@ def write_latex_resume(latex: str, output_path: str = 'app/uploads/main2.tex'):
     """
     with open(output_path, 'w') as f:
         f.write(latex)
-
-
-# def latex_to_pdf(latex: str, output_pdf_path: str) -> bool:
-#     """
-#     Compile a LaTeX string to a PDF file using the 'latex' Python library.
-#     Args:
-#         latex: The LaTeX source as a string.
-#         output_pdf_path: The path where the resulting PDF should be saved.
-#     Returns:
-#         True if PDF was generated successfully, False otherwise.
-#     """
-#     if shutil.which("pdflatex") is None:
-#         print("Error: 'pdflatex' is not installed or not found in PATH. Please install a LaTeX distribution (e.g., MacTeX, TeX Live) and ensure 'pdflatex' is available.")
-#         return False
-#     try:
-#         pdf = build_pdf(latex)
-#         pdf.save_to(output_pdf_path)
-#         return True
-#     except LatexBuildError as e:
-#         print(f"LaTeX build error: {e}")
-#         return False
-#     except Exception as e:
-#         print(f"Error during LaTeX to PDF conversion: {e}")
-#         return False
-
-
 
 
 
@@ -407,8 +247,5 @@ def latex_to_pdf(latex_str, output_path='output.pdf'):
         print(f"PDF generated at: {output_path}")
 
 
-resume_info = extract_resume_info(None)
 
 
-def get_resume_info():
-    return resume_info

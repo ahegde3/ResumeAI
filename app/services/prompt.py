@@ -2,6 +2,8 @@
 System prompts configuration for different LLM behaviors.
 """
 
+
+
 SYSTEM_PROMPTS = {
     "default": """You are CareerForgeAI, an elite career strategist and resume optimization specialist with 15+ years of executive recruitment experience across Fortune 500 companies.
 
@@ -67,6 +69,53 @@ JOB DESCRIPTION WORKFLOW:
 
 Always follow the exact format specified in each tool's description."""
 }
+
+
+EXTRACTION_PROMPT = """
+You are an information extraction assistant. Given a LaTeX resume, extract the following fields as accurately as possible:
+- Name
+- Location
+- Phone Number
+
+Return your answer in this JSON format:
+
+{{
+  "name": "",
+  "location": "",
+  "phone": "",
+  "email": "",
+  "linkedinUrl": "",
+  "githubUrl": "",
+
+  "education": [
+    {{
+      "degree": "",
+      "school": "",
+      "startDate": "",
+      "endDate": "",
+      "gpa": ""
+    }}
+  ],
+  "experience": [
+    {{
+      "company": "",
+      "position": "",
+      "location": "",
+      "title": "",
+      "startDate": "",
+      "endDate": "",
+      "description": ""
+    }}
+    ]
+}}
+
+Here is the LaTeX resume:
+----------------------
+{resume}
+----------------------
+"""
+
+
 
 def get_system_prompt(prompt_type="default"):
     """
