@@ -1,5 +1,5 @@
 
-from app.models.resume import Resume, TechnicalSkillEntry, ExperienceEntry
+from app.models.resume import Resume, TechnicalSkillEntry, ExperienceEntry, ProjectEntry
 from jinja2 import Environment, FileSystemLoader
 import os
 import tempfile
@@ -173,6 +173,45 @@ def change_experience_details(company: str, description: list[str]):
         description=escaped_description
     ))
     print(f"Added new experience details for {company}")
+
+
+def change_project_details(project_name: str, description: list[str], tech: str = None):
+    """
+    Update project details in the resume.
+    
+    Args:
+        project_name: Name of the project to update/add
+        description: List of description bullet points
+        tech: Optional technology stack string
+    """
+    escaped_description = [escape_latex_special_chars(item) for item in description]
+    escaped_project_name = escape_latex_special_chars(project_name)
+    escaped_project_name_lower = escaped_project_name.lower()
+    escaped_tech = escape_latex_special_chars(tech) if tech else None
+    
+    for project in resume_info.projects:
+        # Compare escaped versions for accurate matching
+        project_name_lower = project.name.lower()
+        # Check for exact match or partial match in either direction
+        if (escaped_project_name_lower == project_name_lower or 
+            escaped_project_name_lower in project_name_lower or 
+            project_name_lower in escaped_project_name_lower):
+            project.description = escaped_description
+            if escaped_tech:
+                project.tech = escaped_tech
+            print(f"Changed project details for {project_name}")
+            return
+    
+    # No match found, add new project entry
+    new_project = ProjectEntry(
+        name=escaped_project_name,
+        description=escaped_description
+    )
+    if escaped_tech:
+        new_project.tech = escaped_tech
+    
+    resume_info.projects.append(new_project)
+    print(f"Added new project details for {project_name}")
 
 
 def change_email( new_email):

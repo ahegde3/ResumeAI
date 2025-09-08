@@ -8,7 +8,7 @@ from app.services.llm_handler import LLMHandler
 from app.services.resume import (
     change_email, change_name, change_location, change_technical_skills, 
     resume_to_latex, latex_to_pdf, get_default_resume_content, change_experience_details,
-    delete_technical_skill_category, delete_technical_skill_item
+    delete_technical_skill_category, delete_technical_skill_item, change_project_details
 )
 from app.services.prompt import get_system_prompt
 
@@ -141,6 +141,56 @@ def tool_change_experience_details(experience_input: str):
         
     except Exception as e:
         return f"Error updating experience details: {e}. Input was: {repr(experience_input)}"
+
+@tool("Change Project Details", return_direct=True)
+def tool_change_project_details(project_input: str):
+    """
+    Update project details in the resume.
+    Use this tool when the user asks to update or change project experience in their resume.
+    Input format: project_name|bullet_point_1|bullet_point_2|bullet_point_3[|TECH:technology_stack]
+    Examples: 
+    - AI Teaching Assistant bot|Built a scalable MLOps pipeline|Reduced workflow time by 34%
+    - AI Teaching Assistant bot|Built a scalable MLOps pipeline|Reduced workflow time by 34%|TECH:NextJs, FastAPI, Cloud Run
+    """
+    print(f"Received project_input: {repr(project_input)}")
+    print(f"Input type: {type(project_input)}")
+    
+    try:
+        if not project_input or "|" not in project_input:
+            return "Invalid input format. Use: project_name|bullet_point_1|bullet_point_2|... or project_name|bullet_point_1|...|TECH:tech_stack"
+        
+        parts = project_input.split("|")
+        if len(parts) < 2:
+            return "Invalid input format. Use: project_name|bullet_point_1|bullet_point_2|..."
+        
+        project_name = parts[0].strip()
+        if not project_name:
+            return "Project name is required"
+        
+        # Check if last part is technology specification
+        tech_stack = None
+        description_parts = parts[1:]
+        
+        if len(parts) > 2 and parts[-1].strip().upper().startswith("TECH:"):
+            tech_part = parts[-1].strip()
+            tech_stack = tech_part[5:].strip()  # Remove "TECH:" prefix
+            description_parts = parts[1:-1]  # Exclude tech part from description
+        
+        description_points = [point.strip() for point in description_parts if point.strip()]
+        
+        if not description_points:
+            return "At least one description point is required"
+        
+        change_project_details(project_name, description_points, tech_stack)
+        
+        result_msg = f"Project details updated for '{project_name}' with {len(description_points)} bullet points"
+        if tech_stack:
+            result_msg += f" and technology stack: {tech_stack}"
+        
+        return result_msg
+        
+    except Exception as e:
+        return f"Error updating project details: {e}. Input was: {repr(project_input)}"
 
 @tool("Change Email", return_direct=True)
 def tool_change_email(email: str):
@@ -307,6 +357,13 @@ def tool_auto_optimize_resume(analysis_response: str):
                          "endDate": "End Date",
                          "description": ["Bullet Point 1", "Bullet Point 2", "Bullet Point 3"]
                      }}
+                 ],
+                 "Projects": [
+                     {{
+                         "name": "Project Name",
+                         "tech": "Technology Stack",
+                         "description": ["Project Bullet Point 1", "Project Bullet Point 2"]
+                     }}
                  ]
              }}
             
@@ -357,6 +414,13 @@ def tool_auto_optimize_resume(analysis_response: str):
                          "startDate": "Start Date",
                          "endDate": "End Date",
                          "description": ["Bullet Point 1", "Bullet Point 2", "Bullet Point 3"]
+                     }}
+                 ],
+                 "Projects": [
+                     {{
+                         "name": "Project Name",
+                         "tech": "Technology Stack",
+                         "description": ["Project Bullet Point 1", "Project Bullet Point 2"]
                      }}
                  ]
              }}
@@ -413,6 +477,25 @@ def tool_auto_optimize_resume(analysis_response: str):
                                 changes_made.append(f"Experience: {exp_line}")
                             except Exception as e:
                                 changes_made.append(f"Experience error: {e}")
+                
+                # Handle Project Updates
+                if "projects" in parsed_data:
+                    for project_item in parsed_data["projects"]:
+                        if "name" in project_item and "description" in project_item:
+                            project_name = project_item["name"]
+                            description_points = project_item["description"]
+                            tech_stack = project_item.get("tech", None)
+                            
+                            # Convert to pipe format for existing function
+                            project_line = f"{project_name}|{'|'.join(description_points)}"
+                            if tech_stack:
+                                project_line += f"|TECH:{tech_stack}"
+                            
+                            try:
+                                change_project_details(project_name, description_points, tech_stack)
+                                changes_made.append(f"Project: {project_line}")
+                            except Exception as e:
+                                changes_made.append(f"Project error: {e}")
                 
                 # Generate LaTeX and PDF
                 latex = resume_to_latex()
@@ -509,6 +592,7 @@ ALL_TOOLS = [
     tool_change_technical_skills,
     tool_update_all_technical_skills,
     tool_change_experience_details,
+    tool_change_project_details,
     tool_analyze_job_description,
     tool_auto_optimize_resume,
     tool_delete_technical_skills
