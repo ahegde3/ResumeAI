@@ -39,3 +39,4 @@ class Resume(BaseModel):
     experience: List[ExperienceEntry] = Field(default_factory=list)
     projects: List[ProjectEntry] = Field(default_factory=list)
     technicalSkills: List[TechnicalSkillEntry] = Field(default_factory=list)
+    summary: str = ""

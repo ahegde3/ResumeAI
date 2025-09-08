@@ -8,7 +8,8 @@ from app.services.llm_handler import LLMHandler
 from app.services.resume import (
     change_email, change_name, change_location, change_technical_skills, 
     resume_to_latex, latex_to_pdf, get_default_resume_content, change_experience_details,
-    delete_technical_skill_category, delete_technical_skill_item, change_project_details
+    delete_technical_skill_category, delete_technical_skill_item, change_project_details,
+    change_summary, remove_summary
 )
 from app.services.prompt import get_system_prompt
 
@@ -214,6 +215,26 @@ def tool_change_location(location: str):
     """Change location in resume. Input should be: new_location"""
     change_location(location)
     return "Location changed in resume"
+
+@tool("Change Summary", return_direct=True)
+def tool_change_summary(summary: str):
+    """
+    Update the summary section in the resume.
+    Use this tool when the user asks to update, change, or add a summary to their resume.
+    Input should be the complete summary text.
+    """
+    change_summary(summary)
+    return "Summary updated in resume"
+
+@tool("Remove Summary", return_direct=True)
+def tool_remove_summary(message: str):
+    """
+    Remove the summary section from the resume.
+    Use this tool when the user asks to delete, remove, or clear the summary from their resume.
+    The message parameter is required by the tool framework but not used.
+    """
+    remove_summary()
+    return "Summary section removed from resume"
 
 @tool("Chat", return_direct=True)
 def tool_chat(message: str):
@@ -586,6 +607,8 @@ ALL_TOOLS = [
     tool_change_email,
     tool_change_name,
     tool_change_location,
+    tool_change_summary,
+    tool_remove_summary,
     tool_chat,
     tool_clear_analysis_history,
     tool_get_updated_resume,

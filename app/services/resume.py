@@ -114,7 +114,8 @@ RESUME = {
       "category": "Database",
       "items": ["PostgreSQL", "MySQL", "MongoDB", "Redis", "Elasticsearch"]
     },
-  ]
+  ],
+  "summary": "Software engineer experienced in designing and delivering scalable, high-performance systems across backend, frontend, and cloud environments. Proven track record of building products end-to-end — from architecting distributed systems and optimizing backend services to developing intuitive user interfaces."
 }
 
 
@@ -223,6 +224,24 @@ def change_name(new_name):
 
 def change_location(new_location):
     resume_info.location = new_location
+
+def change_summary(new_summary: str):
+    """
+    Update the summary section in the resume.
+    
+    Args:
+        new_summary: The new summary text to set
+    """
+    escaped_summary = escape_latex_special_chars(new_summary)
+    resume_info.summary = escaped_summary
+    print(f"Changed summary to: {new_summary[:50]}...")
+
+def remove_summary():
+    """
+    Remove the summary section from the resume by setting it to empty string.
+    """
+    resume_info.summary = ""
+    print("Summary section removed from resume")
 
 
 def delete_technical_skill_category(category: str):
