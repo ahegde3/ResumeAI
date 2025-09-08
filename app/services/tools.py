@@ -257,7 +257,7 @@ def tool_analyze_job_description(job_description: str):
 @tool("Auto-Optimize Resume for Job", return_direct=True)
 def tool_auto_optimize_resume(analysis_response: str):
     """
-    Create an optimised resume by taking the response from the analysis tool and applying the changes to the resume.
+    Create an optimised resume by taking the response from the analysis tool and applying the changes to the resume. Use this tool when user asks to optimize the resume for the jd/ job description.
     Use response from the tool_analyze_job_description tool to apply the changes to the resume.
     If analysis_response is "AUTO", it will use the conversation history from the previous analysis.
     """
