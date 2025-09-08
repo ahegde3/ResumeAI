@@ -59,7 +59,7 @@ RESUME = {
       "company": "Weekday (YC W21)",
       "position": "FullStack Engineer (Contract)",
       "location": "Remote, India",
-      "title": "FullStack Engineer",
+      "title": "FullStack Engineer (Contract)",
       "startDate": "Jun 2022",
       "endDate": "Feb 2023",
       "description": [

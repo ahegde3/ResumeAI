@@ -351,7 +351,7 @@ def tool_auto_optimize_resume(analysis_response: str):
             
             # Create optimization prompt that references conversation history
             optimization_prompt = f"""
-            Based on our previous job description analysis conversation, suggest specific technical skills to add/update and experience improvements for this resume:
+            Based on our previous job description analysis conversation, suggest specific technical skills to add/update and experience improvements for this resume. Also, suggest a summary for the resume that matches the job description:
             
             CURRENT RESUME:
             {json.dumps(resume_content.dict(), indent=2)}
@@ -363,6 +363,7 @@ def tool_auto_optimize_resume(analysis_response: str):
              Example:
 
              {{
+                 "Summary": "Summary of the resume that matches the job description",
                  "TechnicalSkills": [
                      {{
                          "category": "Programming Languages",
@@ -408,7 +409,7 @@ def tool_auto_optimize_resume(analysis_response: str):
         else:
             # Use the provided analysis response to generate optimization suggestions
             optimization_prompt = f"""
-            Based on this job description analysis, suggest specific technical skills to add/update and experience improvements:
+            Based on this job description analysis, suggest specific technical skills to add/update and experience improvements. Also, suggest a summary for the resume that matches the job description:
             
             ANALYSIS RESPONSE:
             {analysis_response}
@@ -421,6 +422,7 @@ def tool_auto_optimize_resume(analysis_response: str):
              Example:
 
              {{
+                 "Summary": "Summary of the resume that matches the job description",
                  "TechnicalSkills": [
                      {{
                          "category": "Programming Languages",
@@ -517,6 +519,15 @@ def tool_auto_optimize_resume(analysis_response: str):
                                 changes_made.append(f"Project: {project_line}")
                             except Exception as e:
                                 changes_made.append(f"Project error: {e}")
+
+                # Handle Summary Updates
+                if "summary" in parsed_data:
+                    summary = parsed_data["summary"]
+                    try:
+                        change_summary(summary)
+                        changes_made.append(f"Summary: {summary}")
+                    except Exception as e:
+                        changes_made.append(f"Summary error: {e}")
                 
                 # Generate LaTeX and PDF
                 latex = resume_to_latex()
