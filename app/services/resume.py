@@ -33,53 +33,51 @@ RESUME = {
     {
       "company": "Wave Life Sciences",
       "position": "Software Developer(Co-op)",
-      "location": "Cambridge,MA",
+      "location": "Cambridge, MA",
       "title": "Software Developer(Co-op)",
       "startDate": "Jul 2024",
       "endDate": "Dec 2024",
       "description": [
-        "Enhanced researcher efficiency by 47% by developing UI in React for complex data visualization and interaction.",
+        "Built interactive React-based visualization tools for genomics data, accelerating drug discovery research timelines by 47% and improving cross-team collaboration between researchers and data scientists.",
         "Boosted application performance by 65% (targeting a reduction in load time from 10s to 3.5s) by implementing Redis caching and asynchronous programming patterns.",
-        "Devised and implemented a robust data persistence strategy, integrating local storage with backend caching to ensure a fluid and uninterrupted user experience across multiple sessions."
       ]
     },
     {
       "company": "Toddle",
       "position": "Software Engineer Backend",
-      "location": "Remote,India",
+      "location": "Remote, India",
       "title": "Software Engineer Backend",
-      "startDate": "Apr 2023",
+      "startDate": "Mar 2023",
       "endDate": "Aug 2023",
       "description": [
         "Expanded backend API capabilities by developing and deploying over 15 new GraphQL resolvers and mutations within an AWS Lambda-based serverless microservice architecture.",
-        "Strengthened application security and protected critical data by implementing GraphQL Shield rules, engineering custom authorization for sensitive mutations, and resolving Dataloader caching vulnerabilities.",
+        "Strengthened application security and protected critical data by implementing GraphQL Shield rules, engineering custom authorization for sensitive mutations, and resolving vulnerabilities, ensuring compliance with regulations.",
         "Cut backend latency by 18% for critical data endpoints by analyzing query execution plans to identify bottlenecks, rewriting inefficient SQL queries, and implementing strategic database indexes."
       ]
     },
     {
       "company": "Weekday (YC W21)",
-      "position": "FullStack Engineer",
-      "location": "Remote,India",
+      "position": "FullStack Engineer (Contract)",
+      "location": "Remote, India",
       "title": "FullStack Engineer",
       "startDate": "Jun 2022",
       "endDate": "Feb 2023",
       "description": [
-        "Enhanced platform functionality by delivering multiple end-to-end features, which involved scoping requirements, developing REST APIs (Node.js, Express), and translating Figma mockups into functional React UI components.",
-        "Reduced average time to hire candidates by 2 weeks (28%) by leading the development of a new candidate inbound sourcing strategy.",
-        "Boosted candidate engagement and response rates by 25% by engineering a unified messaging system that consolidated communication over different channels into a single contextual view for recruiters."
+        "Built polished, user-centric frontend features in React, turning Figma designs into performant, accessible interfaces while integrating with backend REST APIs (Node.js, Express).",
+        "Improved engagement by 25% by creating a unified messaging dashboard that consolidated recruiter conversations across multiple platforms into a single contextual view."
       ]
     },
     {
       "company": "Merkle",
       "position": "Software Engineer",
-      "location": "Mumbai,India",
+      "location": "Mumbai, India",
       "title": "Software Engineer",
       "startDate": "Sep 2020",
       "endDate": "May 2022",
       "description": [
-        "Achieved $7,000 in monthly AWS EC2 and proxy cost savings by designing and implementing a high-volume NodeJS-based web crawling product (processing 300,000 URLs daily from 110+ retailers) and re-architecting Kafka message consumption from a push to a pull-based model for improved performance.",
-        "Resolved critical performance bottlenecks and stability issues, cutting CPU usage by 37% and eliminating 100% of message-related server crashes, by executing an architectural shift in Kafka consumption model.",
-        "Reduced analyst workflow effort by 34% by conceptualizing and building an internal React-based Chrome Extension, streamlining data access and manipulation tasks."
+        "Designed and deployed a high-volume web crawling platform processing 300,000 URLs/day across 110+ retailers in multiple regions, enabling real-time competitive pricing and inventory tracking at scale. ",
+        "Cut AWS EC2 and proxy costs by $7,000/month by re-architecting Kafka message consumption from a push-based to a pull-based model, improving crawler performance and reducing server crashes by 100%.",
+        "Reduced analyst workflow time by 34% by building an internal React-based Chrome Extension that automated repetitive data extraction tasks, boosting productivity and accuracy across the team."
       ]
     }
   ],
@@ -87,18 +85,18 @@ RESUME = {
       {
           "name": "AI Teaching Assistant bot",
           "startDate": "Jan 2024",
-          "endDate": "Present",
+          "endDate": "May 2024",
           "tech": "NextJs, FastAPI, Cloud Run,Pub/Sub, LLM",
           "description": [
-            "Engineered a scalable MLOps pipeline capable of processing videos of unlimited length, overcoming the previous 10-minute hard limit, by migrating the core workflow to an asynchronous, Pub/Sub-triggered architecture on GCP.",
-            "Improved student comprehension and retention rates by 30% , engineering an innovative interactive chatbot service designed to enhance learner engagement with video lecture content."
+            "Built a scalable MLOps pipeline for processing long-form video lectures, generating temporal-based vector embeddings, and orchestrating workflows using an event-driven Pub/Sub architecture on GCP.  ",
+            "Reduced analyst workflow time by 34% by building an internal React-based Chrome Extension that automated repetitive data extraction tasks, boosting productivity and accuracy across the team"
           ]
       }
   ],
   "technicalSkills": [
     {
       "category": "Programming Languages",
-      "items": ["Python", "JavaScript/TypeScript", "Java", "Go", "C/C++"]
+      "items": ["Python", "JavaScript, TypeScript", "Java", "Go", "C/C++"]
     },
     {
       "category": "Frontend",
@@ -106,15 +104,15 @@ RESUME = {
     },
     {
       "category": "Backend",
-      "items": ["NodeJs", "Express", "FastAPI", "Flask", "Apache Kafka", "GraphQL", "REST", "gRPC"]
+      "items": ["NodeJs", "Express", "FastAPI", "Apache Kafka", "GraphQL", "REST", "gRPC"]
     },
     {
-      "category": "Cloud & DevOps",
-      "items": ["GCP", "AWS", "Docker", "Kubernetes", "CI/CD", "Git"]
+      "category": "Cloud",
+      "items": ["GCP", "AWS", "Docker", "Kubernetes", "CI/CD"]
     },
     {
       "category": "Database",
-      "items": ["PostgreSQL", "MySQL", "MongoDB", "Redis", "Elasticsearch", "Cassandra", "Neo4j"]
+      "items": ["PostgreSQL", "MySQL", "MongoDB", "Redis", "Elasticsearch"]
     },
   ]
 }
