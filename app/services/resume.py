@@ -10,7 +10,7 @@ RESUME = {
   "name": "Anish Hegde",
   "location": "Boston, MA",
   "phone": "+1 (857)-313-4739",
-  "email": "hegde.anis@northeastern.edu",
+  "email": "ahegde3@outlook.com",
   "linkedinUrl": "linkedin.com/in/ahegde3",
   "githubUrl": "github.com/ahegde3",
   "education": [
@@ -277,6 +277,16 @@ def write_latex_resume(latex: str, output_path: str = 'app/uploads/main2.tex'):
 
 
 def latex_to_pdf(latex_str, output_path='output.pdf'):
+    # Check if pdflatex is available
+    try:
+        subprocess.run(['which', 'pdflatex'], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except subprocess.CalledProcessError:
+        raise RuntimeError(
+            "pdflatex is not installed or not found in PATH. "
+            "Please install LaTeX distribution (e.g., BasicTeX on macOS: brew install --cask basictex) "
+            "and ensure /Library/TeX/texbin is in your PATH."
+        )
+    
     # Create a temporary directory
     with tempfile.TemporaryDirectory() as temp_dir:
         tex_path = os.path.join(temp_dir, 'document.tex')
@@ -287,7 +297,7 @@ def latex_to_pdf(latex_str, output_path='output.pdf'):
 
         # Run pdflatex to generate the PDF
         try:
-            subprocess.run(
+            result = subprocess.run(
                 ['pdflatex', '-interaction=nonstopmode', tex_path],
                 cwd=temp_dir,
                 check=True,
@@ -295,13 +305,29 @@ def latex_to_pdf(latex_str, output_path='output.pdf'):
                 stderr=subprocess.PIPE
             )
         except subprocess.CalledProcessError as e:
+            error_msg = "LaTeX compilation failed. This might be due to missing LaTeX packages."
+            stdout_output = e.stdout.decode() if e.stdout else ""
+            stderr_output = e.stderr.decode() if e.stderr else ""
+            
+            # Check for common missing package errors
+            if "not found" in stdout_output or "not found" in stderr_output:
+                error_msg += " Please install missing LaTeX packages using 'sudo tlmgr install <package-name>'."
+            
             print("LaTeX compilation failed:")
-            print(e.stdout.decode())
-            print(e.stderr.decode())
-            raise RuntimeError("LaTeX compilation failed.")
+            print(stdout_output)
+            print(stderr_output)
+            raise RuntimeError(error_msg)
+        except FileNotFoundError:
+            raise RuntimeError(
+                "pdflatex command not found. Please install LaTeX distribution and ensure it's in your PATH."
+            )
 
-        # Move the resulting PDF to the desired location
+        # Check if PDF was generated
         generated_pdf = os.path.join(temp_dir, 'document.pdf')
+        if not os.path.exists(generated_pdf):
+            raise RuntimeError("PDF generation failed - no output file was created.")
+        
+        # Move the resulting PDF to the desired location
         os.replace(generated_pdf, output_path)
         print(f"PDF generated at: {output_path}")
 
