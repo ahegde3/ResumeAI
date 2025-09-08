@@ -5,7 +5,7 @@
 \documentclass[letterpaper,11pt]{article}
 
 \usepackage{latexsym}
-\usepackage[empty]{fullpage}
+\usepackage[margin=0.75in]{geometry}
 \usepackage{titlesec}
 \usepackage{marvosym}
 \usepackage[usenames,dvipsnames]{color}
@@ -110,6 +110,15 @@
 \end{center}
 
 \vspace{2pt}
+
+%------SUMMARY-------
+\BLOCK{ if resume.summary }
+\section*{Summary}
+\begin{itemize}[leftmargin=0.05in, label={}]
+ \item[] {\small \VAR{resume.summary}}
+\end{itemize}
+\vspace{-8pt} 
+\BLOCK{ endif }
 
 %------Technical Skill-------
 \BLOCK{ if resume.technicalSkills }

@@ -1,5 +1,5 @@
 
-from app.models.resume import Resume, TechnicalSkillEntry, ExperienceEntry
+from app.models.resume import Resume, TechnicalSkillEntry, ExperienceEntry, ProjectEntry
 from jinja2 import Environment, FileSystemLoader
 import os
 import tempfile
@@ -10,7 +10,7 @@ RESUME = {
   "name": "Anish Hegde",
   "location": "Boston, MA",
   "phone": "+1 (857)-313-4739",
-  "email": "hegde.anis@northeastern.edu",
+  "email": "ahegde3@outlook.com",
   "linkedinUrl": "linkedin.com/in/ahegde3",
   "githubUrl": "github.com/ahegde3",
   "education": [
@@ -33,53 +33,51 @@ RESUME = {
     {
       "company": "Wave Life Sciences",
       "position": "Software Developer(Co-op)",
-      "location": "Cambridge,MA",
+      "location": "Cambridge, MA",
       "title": "Software Developer(Co-op)",
       "startDate": "Jul 2024",
       "endDate": "Dec 2024",
       "description": [
-        "Enhanced researcher efficiency by 47% by developing UI in React for complex data visualization and interaction.",
+        "Built interactive React-based visualization tools for genomics data, accelerating drug discovery research timelines by 47% and improving cross-team collaboration between researchers and data scientists.",
         "Boosted application performance by 65% (targeting a reduction in load time from 10s to 3.5s) by implementing Redis caching and asynchronous programming patterns.",
-        "Devised and implemented a robust data persistence strategy, integrating local storage with backend caching to ensure a fluid and uninterrupted user experience across multiple sessions."
       ]
     },
     {
       "company": "Toddle",
       "position": "Software Engineer Backend",
-      "location": "Remote,India",
+      "location": "Remote, India",
       "title": "Software Engineer Backend",
-      "startDate": "Apr 2023",
+      "startDate": "Mar 2023",
       "endDate": "Aug 2023",
       "description": [
         "Expanded backend API capabilities by developing and deploying over 15 new GraphQL resolvers and mutations within an AWS Lambda-based serverless microservice architecture.",
-        "Strengthened application security and protected critical data by implementing GraphQL Shield rules, engineering custom authorization for sensitive mutations, and resolving Dataloader caching vulnerabilities.",
+        "Strengthened application security and protected critical data by implementing GraphQL Shield rules, engineering custom authorization for sensitive mutations, and resolving vulnerabilities, ensuring compliance with regulations.",
         "Cut backend latency by 18% for critical data endpoints by analyzing query execution plans to identify bottlenecks, rewriting inefficient SQL queries, and implementing strategic database indexes."
       ]
     },
     {
       "company": "Weekday (YC W21)",
-      "position": "FullStack Engineer",
-      "location": "Remote,India",
-      "title": "FullStack Engineer",
+      "position": "FullStack Engineer (Contract)",
+      "location": "Remote, India",
+      "title": "FullStack Engineer (Contract)",
       "startDate": "Jun 2022",
       "endDate": "Feb 2023",
       "description": [
-        "Enhanced platform functionality by delivering multiple end-to-end features, which involved scoping requirements, developing REST APIs (Node.js, Express), and translating Figma mockups into functional React UI components.",
-        "Reduced average time to hire candidates by 2 weeks (28%) by leading the development of a new candidate inbound sourcing strategy.",
-        "Boosted candidate engagement and response rates by 25% by engineering a unified messaging system that consolidated communication over different channels into a single contextual view for recruiters."
+        "Built polished, user-centric frontend features in React, turning Figma designs into performant, accessible interfaces while integrating with backend REST APIs (Node.js, Express).",
+        "Improved engagement by 25% by creating a unified messaging dashboard that consolidated recruiter conversations across multiple platforms into a single contextual view."
       ]
     },
     {
       "company": "Merkle",
       "position": "Software Engineer",
-      "location": "Mumbai,India",
+      "location": "Mumbai, India",
       "title": "Software Engineer",
       "startDate": "Sep 2020",
       "endDate": "May 2022",
       "description": [
-        "Achieved $7,000 in monthly AWS EC2 and proxy cost savings by designing and implementing a high-volume NodeJS-based web crawling product (processing 300,000 URLs daily from 110+ retailers) and re-architecting Kafka message consumption from a push to a pull-based model for improved performance.",
-        "Resolved critical performance bottlenecks and stability issues, cutting CPU usage by 37% and eliminating 100% of message-related server crashes, by executing an architectural shift in Kafka consumption model.",
-        "Reduced analyst workflow effort by 34% by conceptualizing and building an internal React-based Chrome Extension, streamlining data access and manipulation tasks."
+        "Designed and deployed a high-volume web crawling platform processing 300,000 URLs/day across 110+ retailers in multiple regions, enabling real-time competitive pricing and inventory tracking at scale. ",
+        "Cut AWS EC2 and proxy costs by $7,000/month by re-architecting Kafka message consumption from a push-based to a pull-based model, improving crawler performance and reducing server crashes by 100%.",
+        "Reduced analyst workflow time by 34% by building an internal React-based Chrome Extension that automated repetitive data extraction tasks, boosting productivity and accuracy across the team."
       ]
     }
   ],
@@ -87,18 +85,18 @@ RESUME = {
       {
           "name": "AI Teaching Assistant bot",
           "startDate": "Jan 2024",
-          "endDate": "Present",
+          "endDate": "May 2024",
           "tech": "NextJs, FastAPI, Cloud Run,Pub/Sub, LLM",
           "description": [
-            "Engineered a scalable MLOps pipeline capable of processing videos of unlimited length, overcoming the previous 10-minute hard limit, by migrating the core workflow to an asynchronous, Pub/Sub-triggered architecture on GCP.",
-            "Improved student comprehension and retention rates by 30% , engineering an innovative interactive chatbot service designed to enhance learner engagement with video lecture content."
+            "Built a scalable MLOps pipeline for processing long-form video lectures, generating temporal-based vector embeddings, and orchestrating workflows using an event-driven Pub/Sub architecture on GCP.  ",
+            "Reduced analyst workflow time by 34% by building an internal React-based Chrome Extension that automated repetitive data extraction tasks, boosting productivity and accuracy across the team"
           ]
       }
   ],
   "technicalSkills": [
     {
       "category": "Programming Languages",
-      "items": ["Python", "JavaScript/TypeScript", "Java", "Go", "C/C++"]
+      "items": ["Python", "JavaScript, TypeScript", "Java", "Go", "C/C++"]
     },
     {
       "category": "Frontend",
@@ -106,17 +104,18 @@ RESUME = {
     },
     {
       "category": "Backend",
-      "items": ["NodeJs", "Express", "FastAPI", "Flask", "Apache Kafka", "GraphQL", "REST", "gRPC"]
+      "items": ["NodeJs", "Express", "FastAPI", "Apache Kafka", "GraphQL", "REST", "gRPC"]
     },
     {
-      "category": "Cloud & DevOps",
-      "items": ["GCP", "AWS", "Docker", "Kubernetes", "CI/CD", "Git"]
+      "category": "Cloud",
+      "items": ["GCP", "AWS", "Docker", "Kubernetes", "CI/CD"]
     },
     {
       "category": "Database",
-      "items": ["PostgreSQL", "MySQL", "MongoDB", "Redis", "Elasticsearch", "Cassandra", "Neo4j"]
+      "items": ["PostgreSQL", "MySQL", "MongoDB", "Redis", "Elasticsearch"]
     },
-  ]
+  ],
+  "summary": "Software engineer experienced in designing and delivering scalable, high-performance systems across backend, frontend, and cloud environments. Proven track record of building products end-to-end — from architecting distributed systems and optimizing backend services to developing intuitive user interfaces."
 }
 
 
@@ -177,6 +176,45 @@ def change_experience_details(company: str, description: list[str]):
     print(f"Added new experience details for {company}")
 
 
+def change_project_details(project_name: str, description: list[str], tech: str = None):
+    """
+    Update project details in the resume.
+    
+    Args:
+        project_name: Name of the project to update/add
+        description: List of description bullet points
+        tech: Optional technology stack string
+    """
+    escaped_description = [escape_latex_special_chars(item) for item in description]
+    escaped_project_name = escape_latex_special_chars(project_name)
+    escaped_project_name_lower = escaped_project_name.lower()
+    escaped_tech = escape_latex_special_chars(tech) if tech else None
+    
+    for project in resume_info.projects:
+        # Compare escaped versions for accurate matching
+        project_name_lower = project.name.lower()
+        # Check for exact match or partial match in either direction
+        if (escaped_project_name_lower == project_name_lower or 
+            escaped_project_name_lower in project_name_lower or 
+            project_name_lower in escaped_project_name_lower):
+            project.description = escaped_description
+            if escaped_tech:
+                project.tech = escaped_tech
+            print(f"Changed project details for {project_name}")
+            return
+    
+    # No match found, add new project entry
+    new_project = ProjectEntry(
+        name=escaped_project_name,
+        description=escaped_description
+    )
+    if escaped_tech:
+        new_project.tech = escaped_tech
+    
+    resume_info.projects.append(new_project)
+    print(f"Added new project details for {project_name}")
+
+
 def change_email( new_email):
     resume_info.email = new_email
 
@@ -186,6 +224,24 @@ def change_name(new_name):
 
 def change_location(new_location):
     resume_info.location = new_location
+
+def change_summary(new_summary: str):
+    """
+    Update the summary section in the resume.
+    
+    Args:
+        new_summary: The new summary text to set
+    """
+    escaped_summary = escape_latex_special_chars(new_summary)
+    resume_info.summary = escaped_summary
+    print(f"Changed summary to: {new_summary[:50]}...")
+
+def remove_summary():
+    """
+    Remove the summary section from the resume by setting it to empty string.
+    """
+    resume_info.summary = ""
+    print("Summary section removed from resume")
 
 
 def delete_technical_skill_category(category: str):
@@ -277,6 +333,16 @@ def write_latex_resume(latex: str, output_path: str = 'app/uploads/main2.tex'):
 
 
 def latex_to_pdf(latex_str, output_path='output.pdf'):
+    # Check if pdflatex is available
+    try:
+        subprocess.run(['which', 'pdflatex'], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except subprocess.CalledProcessError:
+        raise RuntimeError(
+            "pdflatex is not installed or not found in PATH. "
+            "Please install LaTeX distribution (e.g., BasicTeX on macOS: brew install --cask basictex) "
+            "and ensure /Library/TeX/texbin is in your PATH."
+        )
+    
     # Create a temporary directory
     with tempfile.TemporaryDirectory() as temp_dir:
         tex_path = os.path.join(temp_dir, 'document.tex')
@@ -287,7 +353,7 @@ def latex_to_pdf(latex_str, output_path='output.pdf'):
 
         # Run pdflatex to generate the PDF
         try:
-            subprocess.run(
+            result = subprocess.run(
                 ['pdflatex', '-interaction=nonstopmode', tex_path],
                 cwd=temp_dir,
                 check=True,
@@ -295,13 +361,29 @@ def latex_to_pdf(latex_str, output_path='output.pdf'):
                 stderr=subprocess.PIPE
             )
         except subprocess.CalledProcessError as e:
+            error_msg = "LaTeX compilation failed. This might be due to missing LaTeX packages."
+            stdout_output = e.stdout.decode() if e.stdout else ""
+            stderr_output = e.stderr.decode() if e.stderr else ""
+            
+            # Check for common missing package errors
+            if "not found" in stdout_output or "not found" in stderr_output:
+                error_msg += " Please install missing LaTeX packages using 'sudo tlmgr install <package-name>'."
+            
             print("LaTeX compilation failed:")
-            print(e.stdout.decode())
-            print(e.stderr.decode())
-            raise RuntimeError("LaTeX compilation failed.")
+            print(stdout_output)
+            print(stderr_output)
+            raise RuntimeError(error_msg)
+        except FileNotFoundError:
+            raise RuntimeError(
+                "pdflatex command not found. Please install LaTeX distribution and ensure it's in your PATH."
+            )
 
-        # Move the resulting PDF to the desired location
+        # Check if PDF was generated
         generated_pdf = os.path.join(temp_dir, 'document.pdf')
+        if not os.path.exists(generated_pdf):
+            raise RuntimeError("PDF generation failed - no output file was created.")
+        
+        # Move the resulting PDF to the desired location
         os.replace(generated_pdf, output_path)
         print(f"PDF generated at: {output_path}")
 
