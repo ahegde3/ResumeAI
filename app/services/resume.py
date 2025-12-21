@@ -43,28 +43,16 @@ RESUME = {
       ]
     },
     {
-      "company": "Toddle",
-      "position": "Software Engineer Backend",
+      "company": "Weekday (YC W21)",
+      "position": "FullStack Engineer",
       "location": "Remote, India",
-      "title": "Software Engineer Backend",
-      "startDate": "Mar 2023",
+      "title": "FullStack Engineer",
+      "startDate": "Jun 2022",
       "endDate": "Aug 2023",
       "description": [
-        "Expanded backend API capabilities by developing and deploying over 15 new GraphQL resolvers and mutations within an AWS Lambda-based serverless microservice architecture.",
-        "Strengthened application security and protected critical data by implementing GraphQL Shield rules, engineering custom authorization for sensitive mutations, and resolving vulnerabilities, ensuring compliance with regulations.",
-        "Cut backend latency by 18% for critical data endpoints by analyzing query execution plans to identify bottlenecks, rewriting inefficient SQL queries, and implementing strategic database indexes."
-      ]
-    },
-    {
-      "company": "Weekday (YC W21)",
-      "position": "FullStack Engineer (Contract)",
-      "location": "Remote, India",
-      "title": "FullStack Engineer (Contract)",
-      "startDate": "Jun 2022",
-      "endDate": "Feb 2023",
-      "description": [
-        "Built polished, user-centric frontend features in React, turning Figma designs into performant, accessible interfaces while integrating with backend REST APIs (Node.js, Express).",
-        "Improved engagement by 25% by creating a unified messaging dashboard that consolidated recruiter conversations across multiple platforms into a single contextual view."
+        "Built polished, user-centric frontend features in React, turning Figma designs into performant, accessible interfaces while improving Core Web Vitals by 30% by optimizing Redux state management and integrating with backend REST APIs.",
+        "Strengthened application security and protected critical data by implementing GraphQL Shield rules, engineering custom authentication and authorization for sensitive mutations, for a lambda-based serverless microservice architecture.",
+        "Cut backend latency by 18% for critical data endpoints by analyzing query execution plans to identify bottlenecks, rewriting inefficient SQL queries, and implementing strategic database indexes.",
       ]
     },
     {
@@ -79,6 +67,19 @@ RESUME = {
         "Cut AWS EC2 and proxy costs by $7,000/month by re-architecting Kafka message consumption from a push-based to a pull-based model, improving crawler performance and reducing server crashes by 100%.",
         "Reduced analyst workflow time by 34% by building an internal React-based Chrome Extension that automated repetitive data extraction tasks, boosting productivity and accuracy across the team."
       ]
+    },
+        {
+      "company": "Samsung Research",
+      "position": "Software Engineer Intern",
+      "location": "Mumbai, India",
+      "title": "Software Engineer Intern",
+      "startDate": "Jan 2020",
+      "endDate": "Jun 2020",
+      "description": [
+        "Enabled real-time communication for IoT devices on SmartThings platform by developing MQTT protocol integration and message handling workflows supporting 5+ device categories.",
+        "Reduced device onboarding time by 20% (from 5 min to 4 min average) by building automated workflows that optimized API endpoints and eliminated manual validation steps.",
+        "Ensured reliable data persistence by implementing serverless functions that transformed MQTT payloads into structured formats, processing 10K+ messages daily with consistent schema validation.",
+      ]
     }
   ],
   "projects": [
@@ -89,7 +90,9 @@ RESUME = {
           "tech": "NextJs, FastAPI, Cloud Run,Pub/Sub, LLM",
           "description": [
             "Built a scalable MLOps pipeline for processing long-form video lectures, generating temporal-based vector embeddings, and orchestrating workflows using an event-driven Pub/Sub architecture on GCP.  ",
-            "Reduced analyst workflow time by 34% by building an internal React-based Chrome Extension that automated repetitive data extraction tasks, boosting productivity and accuracy across the team"
+            "Developed a low-latency microservice to interface with LLMs, integrating custom tools and optimizations to deliver faster, more accurate responses, resulting in an improved user experience."
+            "Increased student comprehension and retention by 30% by creating an interactive, AI-powered chatbot that enhances learner engagement through context-aware QA over video content."
+
           ]
       }
   ],
@@ -104,15 +107,15 @@ RESUME = {
     },
     {
       "category": "Backend",
-      "items": ["NodeJs", "Express", "FastAPI", "Apache Kafka", "GraphQL", "REST", "gRPC"]
+      "items": ["Node.js", "Express", "FastAPI", "Kafka", "GraphQL", "REST", "gRPC"]
     },
     {
       "category": "Cloud",
-      "items": ["GCP", "AWS", "Docker", "Kubernetes", "CI/CD"]
+      "items": [ "AWS (Lambda, EC2, RDS)","GCP", "Docker", "Kubernetes", "CI/CD", "Terraform", "NGINX"]
     },
     {
-      "category": "Database",
-      "items": ["PostgreSQL", "MySQL", "MongoDB", "Redis", "Elasticsearch"]
+      "category": "Database & Caching",
+      "items": ["PostgreSQL", "MySQL", "MongoDB","DynamoDB", "Redis", "Elasticsearch"]
     },
   ],
   "summary": "Software engineer experienced in designing and delivering scalable, high-performance systems across backend, frontend, and cloud environments. Proven track record of building products end-to-end — from architecting distributed systems and optimizing backend services to developing intuitive user interfaces."
