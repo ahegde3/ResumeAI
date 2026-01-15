@@ -71,7 +71,7 @@ RESUME = {
         {
       "company": "Samsung Research",
       "position": "Software Engineer Intern",
-      "location": "Mumbai, India",
+      "location": "Bangalore, India",
       "title": "Software Engineer Intern",
       "startDate": "Jan 2020",
       "endDate": "Jun 2020",
@@ -88,11 +88,10 @@ RESUME = {
           "startDate": "Jan 2024",
           "endDate": "May 2024",
           "tech": "NextJs, FastAPI, Cloud Run,Pub/Sub, LLM",
-          "description": [
-            "Built a scalable MLOps pipeline for processing long-form video lectures, generating temporal-based vector embeddings, and orchestrating workflows using an event-driven Pub/Sub architecture on GCP.  ",
-            "Developed a low-latency microservice to interface with LLMs, integrating custom tools and optimizations to deliver faster, more accurate responses, resulting in an improved user experience."
-            "Increased student comprehension and retention by 30% by creating an interactive, AI-powered chatbot that enhances learner engagement through context-aware QA over video content."
-
+          "description": [  
+            "Designed a Pub/Sub-based ingestion pipeline for long-form video content, generating temporal embeddings in real time.",
+            "Built a low-latency FastAPI microservice interfacing with LLMs for contextual QA, improving response times by 35%.",
+            "Enhanced data accessibility and scalability through modular microservices integrated with distributed event queues."
           ]
       }
   ],
