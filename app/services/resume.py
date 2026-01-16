@@ -1,10 +1,40 @@
-
-from app.models.resume import Resume, TechnicalSkillEntry, ExperienceEntry, ProjectEntry
-from jinja2 import Environment, FileSystemLoader
+import logging
 import os
 import tempfile
 import subprocess
+from typing import Optional
+
+from app.models.resume import Resume, TechnicalSkillEntry, ExperienceEntry, ProjectEntry
+from jinja2 import Environment, FileSystemLoader
 from app.utils.util import escape_latex_special_chars, escape_data
+
+logger = logging.getLogger(__name__)
+
+
+class PDFGenerationError(Exception):
+    """
+    Custom exception for PDF generation failures.
+    Provides structured error information including LaTeX logs.
+    """
+    def __init__(self, message: str, latex_log: Optional[str] = None, missing_packages: Optional[list[str]] = None):
+        self.message = message
+        self.latex_log = latex_log
+        self.missing_packages = missing_packages or []
+        super().__init__(self.message)
+    
+    def __str__(self):
+        result = self.message
+        if self.missing_packages:
+            result += f"\nMissing packages: {', '.join(self.missing_packages)}"
+        return result
+    
+    def to_dict(self) -> dict:
+        """Convert error to dictionary for API responses."""
+        return {
+            "error": self.message,
+            "latex_log": self.latex_log,
+            "missing_packages": self.missing_packages,
+        }
 
 RESUME = {
   "name": "Anish Hegde",
@@ -312,11 +342,11 @@ def resume_to_latex() -> str:
     """
     env = Environment(
         loader=FileSystemLoader(os.path.join(os.path.dirname(__file__), '../uploads')),
-        block_start_string='\BLOCK{',
+        block_start_string=r'\BLOCK{',
         block_end_string='}',
-        variable_start_string='\VAR{',
+        variable_start_string=r'\VAR{',
         variable_end_string='}',
-        comment_start_string='\#{',
+        comment_start_string=r'\#{',
         comment_end_string='}',
         autoescape=False
     )
@@ -334,12 +364,59 @@ def write_latex_resume(latex: str, output_path: str = 'app/uploads/main2.tex'):
 
 
 
-def latex_to_pdf(latex_str, output_path='output.pdf'):
+def _read_latex_log(temp_dir: str) -> Optional[str]:
+    """Read the LaTeX log file if it exists."""
+    log_path = os.path.join(temp_dir, 'document.log')
+    if os.path.exists(log_path):
+        try:
+            with open(log_path, 'r', errors='ignore') as f:
+                return f.read()
+        except Exception:
+            return None
+    return None
+
+
+def _extract_missing_packages(log_content: str) -> list[str]:
+    """Extract missing package names from LaTeX log."""
+    missing = []
+    if not log_content:
+        return missing
+    
+    # Common patterns for missing packages
+    import re
+    patterns = [
+        r"! LaTeX Error: File `(.+?)\.sty' not found",
+        r"! Package (.+?) Error",
+        r"Package (.+?) not found",
+        r"! I can't find file `(.+?)'",
+    ]
+    
+    for pattern in patterns:
+        matches = re.findall(pattern, log_content)
+        missing.extend(matches)
+    
+    return list(set(missing))
+
+
+def latex_to_pdf(latex_str: str, output_path: str = 'output.pdf') -> str:
+    """
+    Convert LaTeX string to PDF.
+    
+    Args:
+        latex_str: The LaTeX content to compile
+        output_path: Path where the PDF should be saved
+    
+    Returns:
+        str: Path to the generated PDF
+    
+    Raises:
+        PDFGenerationError: If PDF generation fails with detailed error info
+    """
     # Check if pdflatex is available
     try:
         subprocess.run(['which', 'pdflatex'], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     except subprocess.CalledProcessError:
-        raise RuntimeError(
+        raise PDFGenerationError(
             "pdflatex is not installed or not found in PATH. "
             "Please install LaTeX distribution (e.g., BasicTeX on macOS: brew install --cask basictex) "
             "and ensure /Library/TeX/texbin is in your PATH."
@@ -355,7 +432,7 @@ def latex_to_pdf(latex_str, output_path='output.pdf'):
 
         # Run pdflatex to generate the PDF
         try:
-            result = subprocess.run(
+            subprocess.run(
                 ['pdflatex', '-interaction=nonstopmode', tex_path],
                 cwd=temp_dir,
                 check=True,
@@ -363,31 +440,41 @@ def latex_to_pdf(latex_str, output_path='output.pdf'):
                 stderr=subprocess.PIPE
             )
         except subprocess.CalledProcessError as e:
-            error_msg = "LaTeX compilation failed. This might be due to missing LaTeX packages."
             stdout_output = e.stdout.decode() if e.stdout else ""
             stderr_output = e.stderr.decode() if e.stderr else ""
+            latex_log = _read_latex_log(temp_dir)
+            missing_packages = _extract_missing_packages(latex_log or stdout_output)
             
-            # Check for common missing package errors
-            if "not found" in stdout_output or "not found" in stderr_output:
-                error_msg += " Please install missing LaTeX packages using 'sudo tlmgr install <package-name>'."
+            error_msg = "LaTeX compilation failed."
+            if missing_packages:
+                error_msg += f" Missing packages detected: {', '.join(missing_packages)}. "
+                error_msg += "Install them using 'sudo tlmgr install <package-name>'."
             
-            print("LaTeX compilation failed:")
-            print(stdout_output)
-            print(stderr_output)
-            raise RuntimeError(error_msg)
+            logger.error(f"LaTeX compilation failed:\nstdout: {stdout_output}\nstderr: {stderr_output}")
+            
+            raise PDFGenerationError(
+                message=error_msg,
+                latex_log=latex_log,
+                missing_packages=missing_packages
+            )
         except FileNotFoundError:
-            raise RuntimeError(
+            raise PDFGenerationError(
                 "pdflatex command not found. Please install LaTeX distribution and ensure it's in your PATH."
             )
 
         # Check if PDF was generated
         generated_pdf = os.path.join(temp_dir, 'document.pdf')
         if not os.path.exists(generated_pdf):
-            raise RuntimeError("PDF generation failed - no output file was created.")
+            latex_log = _read_latex_log(temp_dir)
+            raise PDFGenerationError(
+                message="PDF generation failed - no output file was created.",
+                latex_log=latex_log
+            )
         
         # Move the resulting PDF to the desired location
         os.replace(generated_pdf, output_path)
-        print(f"PDF generated at: {output_path}")
+        logger.info(f"PDF generated at: {output_path}")
+        return output_path
 
 
 
