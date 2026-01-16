@@ -13,7 +13,7 @@ from app.services.resume import (
     change_email, change_name, change_location, change_technical_skills, 
     resume_to_latex, latex_to_pdf, get_default_resume_content, change_experience_details,
     delete_technical_skill_category, delete_technical_skill_item, change_project_details,
-    change_summary, remove_summary, reset_resume
+    change_summary, remove_summary, reset_resume, resume_info
 )
 from app.services.prompt import get_system_prompt
 
@@ -293,6 +293,18 @@ def tool_get_updated_resume() -> str:
     return "Resume updated and PDF generated successfully"
 
 
+@tool("show_resume")
+def tool_show_resume() -> str:
+    """
+    Show the current resume content in JSON format.
+    Use this when the user wants to see their updated resume, view the resume data, 
+    or asks "show me the updated resume".
+    """
+    logger.info("Showing current resume in JSON format")
+    resume_json = json.dumps(resume_info.model_dump(), indent=2)
+    return f"CURRENT RESUME:\n```json\n{resume_json}\n```"
+
+
 @tool("analyze_job_description", args_schema=JobDescriptionInput, return_direct=True)
 def tool_analyze_job_description(job_description: str) -> str:
     """
@@ -530,6 +542,7 @@ ALL_TOOLS = [
     tool_chat,
     tool_clear_analysis_history,
     tool_get_updated_resume,
+    tool_show_resume,
     tool_change_technical_skills,
     tool_update_all_technical_skills,
     tool_change_experience_details,
