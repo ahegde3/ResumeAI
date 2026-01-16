@@ -72,7 +72,7 @@ You have access to the following tools with structured inputs:
 - **remove_summary**: Remove the summary section
 
 ### Job Analysis:
-- **analyze_job_description**: Analyze a job description and get improvement recommendations
+- **analyze_job_description**: Analyze a job description and prove the analysis to the user.
 - **auto_optimize_resume**: Automatically optimize resume based on previous analysis (use "AUTO") or provided analysis
 
 ### Utility:

@@ -293,7 +293,7 @@ def tool_get_updated_resume() -> str:
     return "Resume updated and PDF generated successfully"
 
 
-@tool("analyze_job_description", args_schema=JobDescriptionInput)
+@tool("analyze_job_description", args_schema=JobDescriptionInput, return_direct=True)
 def tool_analyze_job_description(job_description: str) -> str:
     """
     Analyzes a job description and provides recommendations for resume improvements.
@@ -329,15 +329,17 @@ def tool_analyze_job_description(job_description: str) -> str:
         Format your response as actionable recommendations.
         """
         
+        # Use the reviewer prompt for CareerForgeAI persona with full expertise
+        reviewer_prompt = get_system_prompt("reviewer")
+        
         response = llm_handler.invoke_with_history(
-            system_message="You are a resume optimization expert.",
+            system_message=reviewer_prompt,
             user_message=analysis_prompt,
             add_to_history=True
         )
         
-        if hasattr(response, "content"):
-            return f"JOB DESCRIPTION ANALYSIS:\n\n{response.content}"
-        return f"JOB DESCRIPTION ANALYSIS:\n\n{str(response)}"
+        analysis_content = response.content if hasattr(response, "content") else str(response)
+        return f"JOB DESCRIPTION ANALYSIS:\n\n{analysis_content}\n\n---\n\nWould you like me to auto-optimize your resume based on this analysis?"
         
     except Exception as e:
         logger.error(f"Error analyzing job description: {e}")
