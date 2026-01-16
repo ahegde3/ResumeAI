@@ -13,7 +13,7 @@ from app.services.resume import (
     change_email, change_name, change_location, change_technical_skills, 
     resume_to_latex, latex_to_pdf, get_default_resume_content, change_experience_details,
     delete_technical_skill_category, delete_technical_skill_item, change_project_details,
-    change_summary, remove_summary
+    change_summary, remove_summary, reset_resume
 )
 from app.services.prompt import get_system_prompt
 
@@ -300,6 +300,10 @@ def tool_analyze_job_description(job_description: str) -> str:
     Use this when the user provides a job description and wants to know how to improve their resume.
     """
     logger.info(f"Analyzing job description: {job_description[:100]}...")
+    
+    # Reset resume to original state before analyzing new JD
+    reset_resume()
+    llm_handler.clear_history()
     
     try:
         resume_content = get_default_resume_content()

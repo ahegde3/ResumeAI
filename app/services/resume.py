@@ -161,6 +161,16 @@ def get_default_resume_content():
 resume_info = get_default_resume_content()
 
 
+def reset_resume():
+    """
+    Reset the resume_info to the original default state.
+    Use this when starting analysis for a new job description.
+    """
+    global resume_info
+    resume_info = get_default_resume_content()
+    print("Resume reset to original state")
+
+
 def change_technical_skills(category: str, items: list[str]):
     # Escape LaTeX special characters in each item and category
     escaped_items = [escape_latex_special_chars(item) for item in items]
