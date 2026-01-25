@@ -293,7 +293,7 @@ def tool_get_updated_resume() -> str:
     return "Resume updated and PDF generated successfully"
 
 
-@tool("show_resume")
+@tool("show_resume", return_direct=True)
 def tool_show_resume() -> str:
     """
     Show the current resume content in JSON format.
@@ -367,7 +367,121 @@ def _normalize_json_keys(data: dict) -> dict:
     return data
 
 
-@tool("auto_optimize_resume", args_schema=OptimizeResumeInput)
+def _get_current_skill_items(category: str) -> list[str]:
+    """Get current skill items for a category from resume_info."""
+    category_lower = category.lower()
+    for skill in resume_info.technicalSkills:
+        skill_category_lower = skill.category.lower()
+        if (skill_category_lower == category_lower or 
+            skill_category_lower in category_lower or 
+            category_lower in skill_category_lower):
+            return skill.items.copy()
+    return []
+
+
+def _get_current_experience_description(company: str) -> list[str]:
+    """Get current experience description for a company from resume_info."""
+    company_lower = company.lower()
+    for exp in resume_info.experience:
+        exp_company_lower = exp.company.lower()
+        if (exp_company_lower == company_lower or 
+            exp_company_lower in company_lower or 
+            company_lower in exp_company_lower):
+            return exp.description.copy() if exp.description else []
+    return []
+
+
+def _get_current_project_details(project_name: str) -> dict:
+    """Get current project details from resume_info."""
+    project_name_lower = project_name.lower()
+    for project in resume_info.projects:
+        proj_name_lower = project.name.lower()
+        if (proj_name_lower == project_name_lower or 
+            proj_name_lower in project_name_lower or 
+            project_name_lower in proj_name_lower):
+            return {
+                "description": project.description.copy() if project.description else [],
+                "tech": project.tech if hasattr(project, 'tech') else None
+            }
+    return {"description": [], "tech": None}
+
+
+def _format_detailed_changes(changes: list[dict]) -> str:
+    """Format the detailed changes into a readable string."""
+    if not changes:
+        return "No changes were made."
+    
+    output = []
+    
+    for change in changes:
+        change_type = change.get("type", "Unknown")
+        name = change.get("name", "")
+        
+        if change_type == "skills":
+            output.append(f"\n### Technical Skills: {name}")
+            old_items = change.get("old", [])
+            new_items = change.get("new", [])
+            if old_items:
+                output.append(f"  **Before:** {', '.join(old_items)}")
+            else:
+                output.append(f"  **Before:** (new category)")
+            output.append(f"  **After:** {', '.join(new_items)}")
+            
+        elif change_type == "experience":
+            output.append(f"\n### Experience: {name}")
+            old_desc = change.get("old", [])
+            new_desc = change.get("new", [])
+            if old_desc:
+                output.append("  **Before:**")
+                for i, point in enumerate(old_desc, 1):
+                    output.append(f"    {i}. {point}")
+            else:
+                output.append("  **Before:** (new entry)")
+            output.append("  **After:**")
+            for i, point in enumerate(new_desc, 1):
+                output.append(f"    {i}. {point}")
+                
+        elif change_type == "project":
+            output.append(f"\n### Project: {name}")
+            old_details = change.get("old", {})
+            new_details = change.get("new", {})
+            old_desc = old_details.get("description", [])
+            new_desc = new_details.get("description", [])
+            old_tech = old_details.get("tech")
+            new_tech = new_details.get("tech")
+            
+            if old_desc:
+                output.append("  **Before:**")
+                if old_tech:
+                    output.append(f"    Tech: {old_tech}")
+                for i, point in enumerate(old_desc, 1):
+                    output.append(f"    {i}. {point}")
+            else:
+                output.append("  **Before:** (new entry)")
+            output.append("  **After:**")
+            if new_tech:
+                output.append(f"    Tech: {new_tech}")
+            for i, point in enumerate(new_desc, 1):
+                output.append(f"    {i}. {point}")
+                
+        elif change_type == "summary":
+            output.append(f"\n### Summary")
+            old_summary = change.get("old", "")
+            new_summary = change.get("new", "")
+            if old_summary:
+                output.append(f"  **Before:** {old_summary}")
+            else:
+                output.append("  **Before:** (no summary)")
+            output.append(f"  **After:** {new_summary}")
+            
+        elif change_type == "error":
+            output.append(f"\n### Error: {name}")
+            output.append(f"  {change.get('message', 'Unknown error')}")
+    
+    return "\n".join(output)
+
+
+@tool("auto_optimize_resume", args_schema=OptimizeResumeInput, return_direct=True)
 def tool_auto_optimize_resume(analysis_response: str = "AUTO") -> str:
     """
     Create an optimised resume by applying changes based on job description analysis.
@@ -448,7 +562,7 @@ If no changes are needed for a section, omit that section.
         content = response.content if hasattr(response, "content") else str(response)
         
         # Parse and apply changes from JSON response
-        changes_made = []
+        detailed_changes = []
         
         try:
             json_start = content.find('{')
@@ -468,10 +582,21 @@ If no changes are needed for a section, omit that section.
                             category = skill_category["category"]
                             items = skill_category["items"]
                             try:
+                                # Capture old values before change
+                                old_items = _get_current_skill_items(category)
                                 change_technical_skills(category, items)
-                                changes_made.append(f"Skills: {category}")
+                                detailed_changes.append({
+                                    "type": "skills",
+                                    "name": category,
+                                    "old": old_items,
+                                    "new": items
+                                })
                             except Exception as e:
-                                changes_made.append(f"Skills error ({category}): {e}")
+                                detailed_changes.append({
+                                    "type": "error",
+                                    "name": f"Skills ({category})",
+                                    "message": str(e)
+                                })
                 
                 # Handle Experience Updates
                 if "experience" in parsed_data:
@@ -480,10 +605,21 @@ If no changes are needed for a section, omit that section.
                             company = exp_item["company"]
                             description_points = exp_item["description"]
                             try:
+                                # Capture old values before change
+                                old_description = _get_current_experience_description(company)
                                 change_experience_details(company, description_points)
-                                changes_made.append(f"Experience: {company}")
+                                detailed_changes.append({
+                                    "type": "experience",
+                                    "name": company,
+                                    "old": old_description,
+                                    "new": description_points
+                                })
                             except Exception as e:
-                                changes_made.append(f"Experience error ({company}): {e}")
+                                detailed_changes.append({
+                                    "type": "error",
+                                    "name": f"Experience ({company})",
+                                    "message": str(e)
+                                })
                 
                 # Handle Project Updates
                 if "projects" in parsed_data:
@@ -493,26 +629,55 @@ If no changes are needed for a section, omit that section.
                             description_points = project_item["description"]
                             tech_stack = project_item.get("tech", None)
                             try:
+                                # Capture old values before change
+                                old_details = _get_current_project_details(project_name)
                                 change_project_details(project_name, description_points, tech_stack)
-                                changes_made.append(f"Project: {project_name}")
+                                detailed_changes.append({
+                                    "type": "project",
+                                    "name": project_name,
+                                    "old": old_details,
+                                    "new": {
+                                        "description": description_points,
+                                        "tech": tech_stack
+                                    }
+                                })
                             except Exception as e:
-                                changes_made.append(f"Project error ({project_name}): {e}")
+                                detailed_changes.append({
+                                    "type": "error",
+                                    "name": f"Project ({project_name})",
+                                    "message": str(e)
+                                })
 
                 # Handle Summary Updates
                 if "summary" in parsed_data:
                     summary = parsed_data["summary"]
                     try:
+                        # Capture old summary before change
+                        old_summary = resume_info.summary if resume_info.summary else ""
                         change_summary(summary)
-                        changes_made.append("Summary updated")
+                        detailed_changes.append({
+                            "type": "summary",
+                            "name": "Summary",
+                            "old": old_summary,
+                            "new": summary
+                        })
                     except Exception as e:
-                        changes_made.append(f"Summary error: {e}")
+                        detailed_changes.append({
+                            "type": "error",
+                            "name": "Summary",
+                            "message": str(e)
+                        })
                 
                 # Generate LaTeX and PDF
                 latex = resume_to_latex()
                 latex_to_pdf(latex, "app/uploads/resume.pdf")
                 logger.info("Resume PDF generated")
                 
-                return f"RESUME AUTO-OPTIMIZATION COMPLETE:\n\nChanges applied: {changes_made}\n\nOPTIMIZATION SUGGESTIONS:\n{content}"
+                # Format detailed changes for output
+                formatted_changes = _format_detailed_changes(detailed_changes)
+                changes_count = len([c for c in detailed_changes if c["type"] != "error"])
+                
+                return f"RESUME AUTO-OPTIMIZATION COMPLETE\n\n## Changes Applied ({changes_count} modifications):\n{formatted_changes}"
             
             else:
                 return f"Could not extract valid JSON from response. Raw response:\n\n{content}"
