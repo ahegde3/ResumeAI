@@ -5,7 +5,7 @@
 \documentclass[letterpaper,11pt]{article}
 
 \usepackage{latexsym}
-\usepackage[margin=0.75in]{geometry}
+\usepackage[top=0.25in, bottom=0.25in, left=0.25in, right=0.25in]{geometry}
 \usepackage{titlesec}
 \usepackage{marvosym}
 \usepackage[usenames,dvipsnames]{color}
@@ -19,6 +19,7 @@
 \usepackage{multicol}
 \usepackage{setspace}
 
+
 \setlength{\multicolsep}{-3.0pt}
 \setlength{\columnsep}{-1pt}
 
@@ -28,12 +29,12 @@
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}
 
-% Adjust margins
-\addtolength{\oddsidemargin}{-0.6in}
-\addtolength{\evensidemargin}{-0.5in}
-\addtolength{\textwidth}{1.19in}
-\addtolength{\topmargin}{-.7in}
-\addtolength{\textheight}{1.3in}
+% Margins are now set via geometry package above
+% \addtolength{\oddsidemargin}{-0.6in}
+% \addtolength{\evensidemargin}{-0.5in}
+% \addtolength{\textwidth}{1.19in}
+% \addtolength{\topmargin}{-.7in}
+% \addtolength{\textheight}{1.3in}
 
 \urlstyle{same}
 
@@ -101,15 +102,17 @@
 
 \begin{document}
 
+\vspace{5pt}
+
 %----------HEADING----------
 \begin{center}
-    {\Huge \scshape \VAR{resume.name}} \\ \vspace{1pt}
+    {\Huge \scshape \VAR{resume.name}} \\ \vspace{5pt}
     {\hspace{-30pt}}
     {\small \VAR{resume.location} \textbar\: \VAR{resume.phone} \textbar\: \href{mailto:\VAR{resume.email}}{\underline{\VAR{resume.email}}} \textbar\: \href{\VAR{"https://www."+resume.linkedinUrl}}{\underline{\VAR{resume.linkedinUrl}}} \textbar\: \href{\VAR{"https://www."+resume.githubUrl}}{\underline{\VAR{resume.githubUrl}}}}
     \vspace{-8pt}
 \end{center}
 
-\vspace{2pt}
+% \vspace{2pt}
 
 %------SUMMARY-------
 \BLOCK{ if resume.summary }
