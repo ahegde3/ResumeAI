@@ -37,8 +37,9 @@ Go to http://localhost:8000 to play with the bot.
 ## Road map
 
 - [x] Ability to review the resume with the job description.
-- [x] ABility to generate pdf from latex resume.
+- [x] Ability to generate pdf from latex resume.
 - [x] Ability to change name,email,location,technical skills,experience details.
-- [ ] Better readable response
-- [ ] Inmprove the inellegience of resume generation
-- [ ] Single step review and updated resume generation
+- [x] Better readable response
+- [x] Inmprove the intellegience of resume generation
+- [x] Multiple Model support
+- [ ] Text to speech support
